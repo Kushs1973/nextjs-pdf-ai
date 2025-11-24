@@ -10,36 +10,44 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
-    // 1. Convert the file to a Buffer
+    // 1. Convert file to Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 2. Parse PDF using pdf2json (The Modern Way)
-    const pdfParser = new PDFParser(this, 1); // 1 means "Text Only"
+    // 2. Parse PDF
+    const pdfParser = new PDFParser(this, 1);
 
-    // We wrap this in a Promise because pdf2json uses "Events" (old style callbacks)
     const parsedText = await new Promise((resolve, reject) => {
       pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
       pdfParser.on("pdfParser_dataReady", (pdfData) => {
-        // Extract raw text content
         resolve(pdfParser.getRawTextContent());
       });
       pdfParser.parseBuffer(buffer);
     });
 
-    // 3. Send to OpenAI
+    // 3. FIX: Safe Text Cleaning
+    // Sometimes the text comes back weirdly formatted. We try to clean it,
+    // but if that fails, we just use the raw text instead of crashing.
+    let cleanText;
+    try {
+        cleanText = decodeURIComponent(parsedText);
+    } catch (e) {
+        cleanText = parsedText; // Fallback to raw text if decoding fails
+    }
+    
+    // Limit text length to avoid OpenAI limits
+    const finalText = cleanText.slice(0, 20000);
+
+    // 4. Send to OpenAI
     const client = new OpenAI({ apiKey: apiKey });
     
-    // Clean up text slightly before sending (decode URL format)
-    const cleanText = decodeURIComponent(parsedText).slice(0, 20000);
-
     const prompt = `
     Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
     - Executive Summary
     - Key Points
     - Actionable Insights
     
-    TEXT: ${cleanText}
+    TEXT: ${finalText}
     `;
 
     const completion = await client.chat.completions.create({
