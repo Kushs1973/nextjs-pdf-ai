@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-
-// 1. FIX: Manually create a 'require' tool for the old-school library
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const pdf = require('pdf-parse');
+import PDFParser from 'pdf2json';
 
 export async function POST(req) {
   try {
@@ -14,22 +10,36 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
-    // 2. Read the PDF
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const pdfData = await pdf(buffer);
-    const pdfText = pdfData.text.slice(0, 15000);
+    // 1. Convert the file to a Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // 3. AI Analysis
+    // 2. Parse PDF using pdf2json (The Modern Way)
+    const pdfParser = new PDFParser(this, 1); // 1 means "Text Only"
+
+    // We wrap this in a Promise because pdf2json uses "Events" (old style callbacks)
+    const parsedText = await new Promise((resolve, reject) => {
+      pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
+      pdfParser.on("pdfParser_dataReady", (pdfData) => {
+        // Extract raw text content
+        resolve(pdfParser.getRawTextContent());
+      });
+      pdfParser.parseBuffer(buffer);
+    });
+
+    // 3. Send to OpenAI
     const client = new OpenAI({ apiKey: apiKey });
+    
+    // Clean up text slightly before sending (decode URL format)
+    const cleanText = decodeURIComponent(parsedText).slice(0, 20000);
 
     const prompt = `
     Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
     - Executive Summary
     - Key Points
     - Actionable Insights
-
-    TEXT: ${pdfText}
+    
+    TEXT: ${cleanText}
     `;
 
     const completion = await client.chat.completions.create({
