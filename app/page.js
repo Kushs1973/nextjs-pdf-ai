@@ -22,20 +22,31 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- ANIMATION VARIANTS ---
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.3, delayChildren: 0.2 }
+// --- THE APPLE ANIMATION SETTINGS ---
+const revealVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 50,              // Start 50px lower
+    filter: 'blur(10px)', // Start blurry
+    scale: 0.98         // Start slightly smaller
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,               // Move to final position
+    filter: 'blur(0px)',  // Become clear
+    scale: 1,           // Scale to normal
+    transition: { 
+      duration: 0.8, 
+      ease: [0.22, 1, 0.36, 1] // The "Apple" Easing Curve
+    }
   }
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.95 },
+const staggerContainer = {
+  hidden: { opacity: 0 },
   visible: {
-    opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
   }
 };
 
@@ -65,102 +76,103 @@ export default function LandingPage() {
     <div style={styles.container} className={outfit.className}>
       
       {/* --- BLOCK 1: HERO (PDFly) --- */}
-      <section style={{...styles.sectionBlock, minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+      <motion.section 
+        style={{...styles.sectionBlock, minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={revealVariants} // <--- Apply Apple Animation
+      >
         <div style={styles.glowBg}></div>
         
-        <motion.div
-          initial={{ opacity: 0, y: -100 }} 
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-        >
+        <div>
           <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
             PDFly
           </h1>
-        </motion.div>
-      </section>
+        </div>
+      </motion.section>
 
 
       {/* --- BLOCK 2: HOW IT WORKS --- */}
-      <section style={styles.sectionBlock}>
+      <motion.section 
+        style={styles.sectionBlock}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={revealVariants} // <--- Apply Apple Animation
+      >
         <div style={styles.contentWrapper}>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            style={styles.sectionHeader}
-          >
-            How It Works
-          </motion.h2>
+          <h2 style={styles.sectionHeader}>How It Works</h2>
           
           <motion.div 
             style={styles.grid}
-            variants={containerVariants}
+            variants={staggerContainer} // Stagger the cards inside
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true }}
           >
-            <motion.div style={styles.stepCard} variants={cardVariants}>
+            <motion.div style={styles.stepCard} variants={revealVariants}>
               <div style={styles.stepIcon}><Upload size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>1. Upload</h3>
               <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
             </motion.div>
 
-            <motion.div style={styles.stepCard} variants={cardVariants}>
+            <motion.div style={styles.stepCard} variants={revealVariants}>
               <div style={styles.stepIcon}><Zap size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>2. Analyze</h3>
               <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
             </motion.div>
 
-            <motion.div style={styles.stepCard} variants={cardVariants}>
+            <motion.div style={styles.stepCard} variants={revealVariants}>
               <div style={styles.stepIcon}><FileText size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>3. Insight</h3>
               <p style={styles.stepDesc}>Get structured summaries and executive briefs.</p>
             </motion.div>
           </motion.div>
         </div>
-      </section>
+      </motion.section>
 
 
       {/* --- BLOCK 3: SOCIAL PROOF --- */}
-      <section style={styles.sectionBlock}>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
-          
-          <div style={styles.sliderContainer}>
-            <div style={styles.sliderTrack}>
-              {[...reviews, ...reviews, ...reviews].map((review, index) => (
-                <div key={index} style={styles.reviewCard}>
-                  <div style={styles.reviewHeader}>
-                    <div style={styles.avatar}><User size={14} color="#fff"/></div>
-                    <div>
-                      <div style={styles.reviewName}>{review.name}</div>
-                      <div style={styles.stars}>
-                        {[1,2,3,4,5].map(i => <Star key={i} size={8} fill="#fff" color="none"/>)}
-                      </div>
+      <motion.section 
+        style={styles.sectionBlock}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={revealVariants} // <--- Apply Apple Animation
+      >
+        <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
+        
+        <div style={styles.sliderContainer}>
+          <div style={styles.sliderTrack}>
+            {[...reviews, ...reviews, ...reviews].map((review, index) => (
+              <div key={index} style={styles.reviewCard}>
+                <div style={styles.reviewHeader}>
+                  <div style={styles.avatar}><User size={14} color="#fff"/></div>
+                  <div>
+                    <div style={styles.reviewName}>{review.name}</div>
+                    <div style={styles.stars}>
+                      {[1,2,3,4,5].map(i => <Star key={i} size={8} fill="#fff" color="none"/>)}
                     </div>
                   </div>
-                  <p style={styles.reviewText}>"{review.text}"</p>
                 </div>
-              ))}
-            </div>
+                <p style={styles.reviewText}>"{review.text}"</p>
+              </div>
+            ))}
           </div>
-        </motion.div>
-      </section>
+        </div>
+      </motion.section>
 
 
       {/* --- BLOCK 4: CTA --- */}
-      <section style={{...styles.sectionBlock, minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          style={{textAlign: 'center'}}
-        >
+      <motion.section 
+        style={{...styles.sectionBlock, minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.5 }}
+        variants={revealVariants} // <--- Apply Apple Animation
+      >
+        <div style={{textAlign: 'center'}}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer">
             <motion.button 
@@ -171,8 +183,8 @@ export default function LandingPage() {
               Launch PDFly <ArrowRight size={20} />
             </motion.button>
           </Link>
-        </motion.div>
-      </section>
+        </div>
+      </motion.section>
 
       <style jsx global>{`
         @keyframes scroll {
@@ -207,7 +219,7 @@ const styles = {
 
   // --- THE SEPARATE RECTANGLES STYLE ---
   sectionBlock: {
-    backgroundColor: '#080808', // Very dark grey, slightly lighter than background
+    backgroundColor: '#080808', // Very dark grey
     borderRadius: '30px',       // Rounded corners
     border: '1px solid #222',   // Subtle border
     padding: '60px 20px',       // Breathing room inside the rectangle
@@ -228,7 +240,7 @@ const styles = {
   stepCard: { padding: '40px', border: '1px solid #333', borderRadius: '20px', backgroundColor: '#000', transition: 'border-color 0.3s' },
   stepIcon: { marginBottom: '20px', opacity: 0.9 },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
-  stepDesc: { color: '#ddd', lineHeight: '1.6', fontSize: '1.1rem' }, // Brighter text
+  stepDesc: { color: '#ddd', lineHeight: '1.6', fontSize: '1.1rem' },
 
   // SLIDER
   sliderContainer: { width: '100%', overflow: 'hidden' },
