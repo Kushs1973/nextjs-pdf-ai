@@ -22,7 +22,7 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- ANIMATION VARIANTS ---
+// --- ANIMATION VARIANTS (RESTORED) ---
 const revealVariants = {
   hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
@@ -64,30 +64,30 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- BACKGROUND GRID ANIMATION --- */}
+      {/* --- BACKGROUND GRID --- */}
       <div style={styles.gridBackground}></div>
 
-      {/* --- SECTION 1: HERO (Glass Card) --- */}
+      {/* --- SECTION 1: HERO --- */}
+      {/* Animation: Immediate Drop-in (ignoring scroll) */}
+      <section style={styles.sectionBlock}>
+        <motion.div
+          initial={{ opacity: 0, y: -100, filter: 'blur(10px)' }} 
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >
+          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+            PDFly
+          </h1>
+        </motion.div>
+      </section>
+
+
+      {/* --- SECTION 2: HOW IT WORKS --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-        variants={revealVariants}
-      >
-        {/* GLITCH TITLE: Removed Glow, Added slight letter spacing for clarity */}
-        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
-          PDFly
-        </h1>
-      </motion.section>
-
-
-      {/* --- SECTION 2: HOW IT WORKS (Glass Card) --- */}
-      <motion.section 
-        style={styles.sectionBlock}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
         variants={revealVariants}
       >
         <div style={styles.contentWrapper}>
@@ -122,12 +122,12 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 3: SOCIAL PROOF (Glass Card) --- */}
+      {/* --- SECTION 3: SOCIAL PROOF --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
         variants={revealVariants}
       >
         <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
@@ -153,12 +153,12 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 4: CTA (Glass Card) --- */}
+      {/* --- SECTION 4: CTA --- */}
       <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
+        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
         variants={revealVariants}
       >
         <div style={{
@@ -189,7 +189,7 @@ export default function LandingPage() {
           0% { background-position: 0 0; }
           100% { background-position: 40px 40px; }
         }
-        body { margin: 0; background-color: #121212; } /* Lighter Dark Grey */
+        body { margin: 0; background-color: #121212; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
     </div>
@@ -204,10 +204,10 @@ const reviews = [
   { name: "Priya K.", text: "Cleanest UI I have ever seen." },
 ];
 
-// STYLES
+// STYLES (Your Perfect Colors)
 const styles = {
   container: {
-    backgroundColor: '#121212', // CHANGED: From #000 to #121212 (Softer)
+    backgroundColor: '#121212', // DEEP CHARCOAL
     color: '#ffffff',
     minHeight: '100vh',
     padding: '40px 20px', 
@@ -218,31 +218,27 @@ const styles = {
     overflow: 'hidden',
   },
 
-  // --- LIGHTER GRID BACKGROUND ---
   gridBackground: {
     position: 'fixed',
     top: 0, left: 0, width: '100vw', height: '100vh',
     zIndex: 0,
-    // Brighter grid lines (0.05 -> 0.08)
     backgroundImage: `
       linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
     `,
     backgroundSize: '40px 40px',
     animation: 'gridMove 20s linear infinite',
-    opacity: 0.5, // Increased opacity slightly
+    opacity: 0.5,
   },
 
-  // --- BRIGHTER GLASS CARDS ---
   sectionBlock: {
     zIndex: 1,
-    // Increased whiteness: 0.03 -> 0.07 for a "lighter" feel
-    backgroundColor: 'rgba(255, 255, 255, 0.07)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.07)', // Brighter Glass
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px',
-    border: '1px solid rgba(255, 255, 255, 0.1)', // Brighter border
-    minHeight: '80vh',             
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    minHeight: '80vh', // Perfect height for breathing room
     padding: '40px',
     position: 'relative',
     overflow: 'hidden',
@@ -250,24 +246,20 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.3)', // Softer shadow
+    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
 
-  // HERO STYLES (NO GLOW)
-  // Removed textShadow entirely for a crisp look
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
   
-  // COMMON SECTION STYLES
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
   
-  // Cards are lighter now too
   stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', transition: 'transform 0.3s' },
-  stepIcon: { marginBottom: '20px', opacity: 1 }, // Full opacity icon
+  stepIcon: { marginBottom: '20px', opacity: 1 },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
-  stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem' }, // Brighter text
+  stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem' },
 
   sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
@@ -277,7 +269,7 @@ const styles = {
   avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
   stars: { display: 'flex', gap: '2px', marginTop: '2px' },
-  reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' }, // Brighter text
+  reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' },
 
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
   finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' },
