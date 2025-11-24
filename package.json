@@ -13,7 +13,7 @@
     "react": "latest",
     "react-dom": "latest",
     "openai": "latest",
-    "pdf-parse": "latest", 
+    "pdf2json": "latest",
     "lucide-react": "latest",
     "framer-motion": "latest"
   }
