@@ -369,4 +369,34 @@ const styles = {
   sliderContainer: { width: '100%', overflow: 'hidden', marginTop: 'auto', marginBottom: 'auto' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
   
-  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(
+  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
+  reviewHeader: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' },
+  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
+  stars: { display: 'flex', gap: '2px', marginTop: '2px' },
+  reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' },
+
+  ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
+  
+  finalButton: { 
+    padding: '25px 60px', 
+    fontSize: '1.5rem', 
+    backgroundColor: '#fff', 
+    color: '#000', 
+    border: 'none', 
+    borderRadius: '100px', 
+    cursor: 'pointer', 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '15px', 
+    fontWeight: 'bold', 
+    textDecoration: 'none',
+    position: 'relative', 
+    overflow: 'hidden'
+  },
+  shimmer: {
+    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+    background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
+    animation: 'shimmerMove 3s infinite',
+  }
+};
