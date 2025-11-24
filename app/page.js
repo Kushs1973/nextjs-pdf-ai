@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
@@ -41,13 +41,9 @@ const staggerContainer = {
 
 export default function LandingPage() {
   
-  // --- FONT EFFECT STATE ---
+  // --- FONT EFFECT ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
-  
-  // --- VANTA 3D EFFECT REF ---
-  const vantaRef = useRef(null);
 
-  // 1. Handle Font Switching
   useEffect(() => {
     const fonts = [
       inputSerifLike.style.fontFamily,
@@ -65,66 +61,27 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // 2. Handle Vanta Globe Effect
-  useEffect(() => {
-    let vantaEffect = null;
-    
-    // We check if the script is loaded and the ref exists
-    const initVanta = () => {
-      if (!vantaEffect && window.VANTA && vantaRef.current) {
-        vantaEffect = window.VANTA.GLOBE({
-          el: vantaRef.current, // Attach to the Hero Section
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: 0xffffff,       // The Dots Color (White)
-          backgroundColor: 0x1F1F1F, // MATCHES THE CARD GREY
-          size: 1.50             // Globe Size
-        });
-      }
-    };
-
-    // Retry a few times in case script is slow to load
-    const timeout = setTimeout(initVanta, 100);
-    const timeout2 = setTimeout(initVanta, 500);
-    const timeout3 = setTimeout(initVanta, 1000);
-
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
-      clearTimeout(timeout);
-      clearTimeout(timeout2);
-      clearTimeout(timeout3);
-    };
-  }, []);
-
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- SECTION 1: HERO (PDFly + 3D GLOBE) --- */}
+      {/* --- BACKGROUND GRID ANIMATION --- */}
+      <div style={styles.gridBackground}></div>
+
+      {/* --- SECTION 1: HERO (Glass Card) --- */}
       <motion.section 
-        ref={vantaRef} // <--- THE GLOBE LIVES HERE
-        style={{...styles.sectionBlock, minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+        style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        {/* Removed glowBg because Vanta replaces it */}
-        
-        {/* Z-Index ensures text sits ON TOP of the globe */}
-        <div style={{ zIndex: 10, position: 'relative', pointerEvents: 'none' }}>
-          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
-            PDFly
-          </h1>
-        </div>
+        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+          PDFly
+        </h1>
       </motion.section>
 
 
-      {/* --- SECTION 2: HOW IT WORKS --- */}
+      {/* --- SECTION 2: HOW IT WORKS (Glass Card) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -164,7 +121,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 3: SOCIAL PROOF --- */}
+      {/* --- SECTION 3: SOCIAL PROOF (Glass Card) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -195,7 +152,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 4: CTA --- */}
+      {/* --- SECTION 4: CTA (Glass Card) --- */}
       <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
@@ -227,6 +184,13 @@ export default function LandingPage() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        
+        /* THE MOVING GRID ANIMATION */
+        @keyframes gridMove {
+          0% { background-position: 0 0; }
+          100% { background-position: 40px 40px; }
+        }
+
         body { margin: 0; background-color: #000; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
@@ -252,12 +216,33 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '60px',
+    position: 'relative',
+    overflow: 'hidden',
   },
 
-  // --- RECTANGLE STYLE ---
+  // --- THE NEW CYBER GRID BACKGROUND ---
+  gridBackground: {
+    position: 'fixed', // Fixed so it stays while you scroll
+    top: 0, left: 0, width: '100vw', height: '100vh',
+    zIndex: 0,
+    // This creates a subtle grid pattern
+    backgroundImage: `
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+    `,
+    backgroundSize: '40px 40px', // Size of grid squares
+    animation: 'gridMove 20s linear infinite', // Makes it move slowly
+    opacity: 0.4,
+  },
+
+  // --- TRANSPARENT GLASS STYLE ---
   sectionBlock: {
-    backgroundColor: '#1F1F1F', 
+    zIndex: 1, // Sits on top of the grid
+    backgroundColor: 'rgba(255, 255, 255, 0.03)', // VERY Transparent
+    backdropFilter: 'blur(20px)',                 // The "Frosted" effect
+    WebkitBackdropFilter: 'blur(20px)',           // Safari support
     borderRadius: '40px',
+    border: '1px solid rgba(255, 255, 255, 0.08)', // Subtle white border
     minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
@@ -266,7 +251,7 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',     // Shadow for depth
   },
 
   // HERO STYLES
@@ -278,7 +263,10 @@ const styles = {
 
   // GRID
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
-  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: '#2a2a2a', transition: 'transform 0.3s' },
+  
+  // Steps also get glass effect
+  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)', transition: 'transform 0.3s' },
+  
   stepIcon: { marginBottom: '20px', opacity: 0.9 },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#ccc', lineHeight: '1.6', fontSize: '1.1rem' },
@@ -286,7 +274,10 @@ const styles = {
   // SLIDER
   sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
-  reviewCard: { width: '300px', padding: '25px', backgroundColor: '#2a2a2a', borderRadius: '15px', flexShrink: 0 },
+  
+  // Reviews also get glass effect
+  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
+  
   reviewHeader: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' },
   avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#444', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
