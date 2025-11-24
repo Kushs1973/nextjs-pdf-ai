@@ -105,7 +105,6 @@ export default function LandingPage() {
       ></div>
 
       {/* --- SECTION 1: HERO --- */}
-      {/* This one needs to be centered, so we keep justifyContent: center here manually */}
       <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
@@ -304,41 +303,46 @@ const styles = {
     borderRadius: '40px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     minHeight: '80vh',             
-    padding: '40px',
+    padding: '40px', // FIXED: Removed extra paddingTop, reverted to uniform 40px
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start', // FIXED: Pushes content to TOP
+    justifyContent: 'flex-start', 
     alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-    paddingTop: '100px', // FIXED: Adds space at top for Header
   },
 
-  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' }, // Center logo vertically
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' },
   
-  // WRAPPER that takes full height to space out children
   contentWrapper: { 
     maxWidth: '1200px', 
     margin: '0 auto', 
     width: '100%',
-    height: '100%', // Take full height of section
+    height: '100%', 
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start', // Start from top
+    justifyContent: 'flex-start', 
     alignItems: 'center'
   },
   
-  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '0px', fontWeight: 'bold', color: '#fff' },
+  // FIXED HEADER SPACING
+  sectionHeader: { 
+    fontSize: '3rem', 
+    textAlign: 'center', 
+    marginBottom: '20px', // Small margin, letting the grid push away
+    marginTop: '20px',    // Keep it near top
+    fontWeight: 'bold', 
+    color: '#fff' 
+  },
 
-  // GRID FIXED
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
     justifyContent: 'center', 
     gap: '30px', 
     width: '100%',
-    marginTop: 'auto', // FIXED: Pushes Grid to vertical center/bottom
+    marginTop: 'auto', 
     marginBottom: 'auto',
   },
   
@@ -365,7 +369,6 @@ const styles = {
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem', textAlign: 'left' },
 
-  // Slider: Pushes to center of its section
   sliderContainer: { width: '100%', overflow: 'hidden', marginTop: 'auto', marginBottom: 'auto' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
   
