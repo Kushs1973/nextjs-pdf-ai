@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
@@ -10,6 +10,30 @@ const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] })
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '500', '700'] });
 
 export default function LandingPage() {
+  
+  // --- NEW: LOGIC FOR FONT CHANGING EFFECT ---
+  const [currentFont, setCurrentFont] = useState(orbitron.style.fontFamily);
+
+  useEffect(() => {
+    // The list of fonts to cycle through
+    const fonts = [
+      orbitron.style.fontFamily, // Futuristic
+      '"Courier New", monospace', // Code style
+      '"Times New Roman", serif', // Classic style
+      '"Brush Script MT", cursive', // Handwritten
+      'Impact, sans-serif' // Bold
+    ];
+
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % fonts.length;
+      setCurrentFont(fonts[index]);
+    }, 400); // Change font every 400 milliseconds
+
+    return () => clearInterval(interval);
+  }, []);
+  // -------------------------------------------
+
   return (
     <div style={styles.container} className={outfit.className}>
       
@@ -21,7 +45,8 @@ export default function LandingPage() {
           animate={{ y: [-10, 10, -10] }} // Floating Animation
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          <h1 className={orbitron.className} style={styles.floatingTitle}>
+          {/* THE CHANGING FONT TITLE */}
+          <h1 style={{...styles.floatingTitle, fontFamily: currentFont}}>
             PDFly
           </h1>
         </motion.div>
@@ -158,7 +183,10 @@ const styles = {
   
   // HERO
   heroSection: { height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' },
-  floatingTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)' },
+  
+  // Updated Floating Title Style to accept dynamic font
+  floatingTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease' },
+  
   heroSubtitle: { fontSize: '1.2rem', color: '#666', marginTop: '20px', letterSpacing: '1px' },
   glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 70%)', zIndex: -1 },
   scrollIndicator: { position: 'absolute', bottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' },
