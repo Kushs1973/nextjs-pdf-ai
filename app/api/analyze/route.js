@@ -6,26 +6,25 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
-
-    // --- SECURITY UPGRADE ---
-    // Instead of getting the key from the user, we get it from the Server Vault
     const apiKey = process.env.OPENAI_API_KEY; 
 
+    // 1. Basic Checks
     if (!apiKey) {
       return NextResponse.json({ error: "Server Configuration Error: API Key missing." }, { status: 500 });
     }
-
-    if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
 
     const client = new OpenAI({ apiKey: apiKey });
     let promptContent = "";
     
-    // Check if the file is an Image or a PDF
-    const isImage = file.type.startsWith('image/');
+    // 2. Prepare File
     const buffer = Buffer.from(await file.arrayBuffer());
+    const isImage = file.type.startsWith('image/');
 
     if (isImage) {
-        // --- IMAGE HANDLING ---
+        // --- IMAGE HANDLING (Vision) ---
         const base64Image = buffer.toString('base64');
         const dataUrl = `data:${file.type};base64,${base64Image}`;
         
@@ -35,11 +34,18 @@ export async function POST(req) {
         ];
 
     } else {
-        // --- PDF HANDLING ---
+        // --- PDF HANDLING (Text) ---
         const pdfParser = new PDFParser(this, 1);
+        
+        // --- THE FIX IS HERE ---
         const parsedText = await new Promise((resolve, reject) => {
             pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
-            pdfParser.on("pdfParser_dataReady", (pdfData) => resolve(pdfData.getRawTextContent()));
+            
+            // OLD (Broken): resolve(pdfData.getRawTextContent())
+            // NEW (Fixed):  resolve(pdfParser.getRawTextContent()) 
+            // We ask the PARSER tool to give us the text, not the data object.
+            pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
+            
             pdfParser.parseBuffer(buffer);
         });
 
@@ -47,6 +53,7 @@ export async function POST(req) {
         try { cleanText = decodeURIComponent(parsedText); } 
         catch (e) { cleanText = parsedText; }
 
+        // Check if PDF is empty (scanned)
         if (!cleanText || cleanText.trim().length < 20) {
              return NextResponse.json({ 
                 result: `
@@ -65,6 +72,7 @@ export async function POST(req) {
         `;
     }
 
+    // 3. Send to OpenAI
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
