@@ -39,14 +39,14 @@ const staggerContainer = {
   }
 };
 
-// --- WHITE HOLOGRAPHIC HOVER ---
+// --- WHITE HOLOGRAPHIC HOVER (The Cool Effect) ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
     scale: 1.03, 
-    borderColor: "rgba(255, 255, 255, 0.8)", 
-    backgroundColor: "rgba(255, 255, 255, 0.1)", 
-    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", 
+    borderColor: "rgba(255, 255, 255, 0.8)", // Bright White Border
+    backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle White Tint
+    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", // White Glow
     y: -5,
     transition: { duration: 0.3 }
   }
@@ -76,8 +76,11 @@ export default function LandingPage() {
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
+      
+      // Trigger Glitch
       setGlitchActive(true);
       setTimeout(() => setGlitchActive(false), 150); 
+
     }, 400);
 
     const updateMousePosition = (e) => {
@@ -303,12 +306,12 @@ const styles = {
     borderRadius: '40px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     minHeight: '80vh',             
-    padding: '40px', // FIXED: Removed extra paddingTop, reverted to uniform 40px
+    padding: '40px',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start', 
+    justifyContent: 'flex-start', // FIXED: Top alignment
     alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
@@ -326,16 +329,9 @@ const styles = {
     alignItems: 'center'
   },
   
-  // FIXED HEADER SPACING
-  sectionHeader: { 
-    fontSize: '3rem', 
-    textAlign: 'center', 
-    marginBottom: '20px', // Small margin, letting the grid push away
-    marginTop: '20px',    // Keep it near top
-    fontWeight: 'bold', 
-    color: '#fff' 
-  },
+  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '20px', marginTop: '20px', fontWeight: 'bold', color: '#fff' },
 
+  // FLEX GRID
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
