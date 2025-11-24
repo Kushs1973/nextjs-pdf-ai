@@ -43,11 +43,11 @@ const staggerContainer = {
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
-    scale: 1.05, 
-    borderColor: "rgba(255, 255, 255, 0.8)", // Bright White Border
-    backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle White Tint
-    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", // White Glow
-    y: -10,
+    scale: 1.03, // Reduced scale slightly to prevent layout shift
+    borderColor: "rgba(255, 255, 255, 0.8)", 
+    backgroundColor: "rgba(255, 255, 255, 0.1)", 
+    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", 
+    y: -5,
     transition: { duration: 0.3 }
   }
 };
@@ -138,7 +138,7 @@ export default function LandingPage() {
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
-          {/* USING FLEXGRID FOR CENTERING */}
+          {/* FLEX GRID - Forces Perfect Centering */}
           <motion.div 
             style={styles.flexGrid} 
             variants={staggerContainer}
@@ -316,22 +316,33 @@ const styles = {
 
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 0 },
   
-  contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
+  // Added Centering to Wrapper
+  contentWrapper: { 
+    maxWidth: '1200px', 
+    margin: '0 auto', 
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
-  // --- FIXED: FLEX GRID STYLES ---
+  // --- FLEX GRID (FIXED) ---
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
-    justifyContent: 'center', // THIS CENTERS THEM
+    justifyContent: 'center', 
     gap: '30px', 
     width: '100%' 
   },
   
+  // --- STEP CARD CONTAINER (FLEXIBLE) ---
   stepCardContainer: { 
     position: 'relative',
-    width: '300px', 
-    flexShrink: 0,
+    flex: '1 1 300px',  // Grow, Shrink, Start at 300px
+    maxWidth: '380px',  // Don't get too fat
+    minWidth: '280px',  // Don't get too skinny
   },
   
   cardContent: { 
