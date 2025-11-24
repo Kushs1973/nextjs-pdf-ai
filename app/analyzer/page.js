@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Upload, FileText, Zap, AlertCircle } from 'lucide-react';
 
 export default function Analyzer() {
-  // We no longer need state for apiKey
   const [file, setFile] = useState(null);
   const [analysis, setAnalysis] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,11 +14,10 @@ export default function Analyzer() {
     }
 
     setLoading(true);
-    setAnalysis(''); // Clear previous results
+    setAnalysis('');
 
     const formData = new FormData();
     formData.append('file', file);
-    // We do NOT send the API key from here anymore. The server already has it.
 
     try {
       const response = await fetch('/api/analyze', {
@@ -27,12 +25,27 @@ export default function Analyzer() {
         body: formData,
       });
 
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
+      const contentType = response.headers.get("content-type");
       
-      setAnalysis(data.result);
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        // --- THE FIX: REMOVE THE MARKDOWN TAGS ---
+        // This deletes "```html" and "```" from the AI's answer
+        let cleanResult = data.result
+          .replace(/```html/g, "")
+          .replace(/```/g, "");
+          
+        setAnalysis(cleanResult);
+      } else {
+        const text = await response.text();
+        throw new Error("Server Error: " + text.slice(0, 100));
+      }
+
     } catch (err) {
-      alert("Error: " + err.message);
+      console.error(err);
+      alert("Analysis Failed: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -46,8 +59,6 @@ export default function Analyzer() {
             <p style={styles.subtitle}>Upload your document below.</p>
         </div>
         
-        {/* API KEY INPUT IS REMOVED */}
-
         <div style={styles.uploadBox}>
           <input 
             type="file" 
