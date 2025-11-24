@@ -39,20 +39,19 @@ const staggerContainer = {
   }
 };
 
-// --- NEW: HOLOGRAPHIC CARD HOVER EFFECT ---
+// --- HOLOGRAPHIC CARD HOVER ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
     scale: 1.05, 
-    borderColor: "rgba(59, 130, 246, 0.5)", // Electric Blue Border
-    backgroundColor: "rgba(59, 130, 246, 0.1)", // Subtle Blue Tint
-    boxShadow: "0 10px 40px rgba(59, 130, 246, 0.2)", // Glowing Shadow
+    borderColor: "rgba(59, 130, 246, 0.5)", 
+    backgroundColor: "rgba(59, 130, 246, 0.1)", 
+    boxShadow: "0 10px 40px rgba(59, 130, 246, 0.2)", 
     y: -10,
     transition: { duration: 0.3 }
   }
 };
 
-// --- NEW: ICON SPIN EFFECT ---
 const iconSpin = {
   rest: { rotate: 0 },
   hover: { rotate: 360, scale: 1.2, color: "#60a5fa", transition: { duration: 0.5 } }
@@ -60,11 +59,8 @@ const iconSpin = {
 
 export default function LandingPage() {
   
-  // --- FONT EFFECT ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
-  const [glitchActive, setGlitchActive] = useState(false); // Track glitch state
-
-  // --- SPOTLIGHT STATE ---
+  const [glitchActive, setGlitchActive] = useState(false); 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -81,13 +77,12 @@ export default function LandingPage() {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
       
-      // Trigger Glitch Shake
+      // Trigger HARD Glitch
       setGlitchActive(true);
-      setTimeout(() => setGlitchActive(false), 100); // Shake for 100ms
+      setTimeout(() => setGlitchActive(false), 150); 
 
     }, 400);
 
-    // Mouse Tracking
     const updateMousePosition = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -104,8 +99,6 @@ export default function LandingPage() {
       
       {/* --- BACKGROUND LAYERS --- */}
       <div style={styles.gridBackground}></div>
-      
-      {/* SPOTLIGHT LAYER */}
       <div 
         style={{
           ...styles.spotlightLayer,
@@ -122,17 +115,23 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        {/* GLITCH TITLE ANIMATION */}
+        {/* GLITCH TITLE: More aggressive x-movement and Skew */}
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
-          animate={glitchActive ? { x: [-2, 2, -2, 0], opacity: 0.8 } : { x: 0, opacity: 1 }}
+          animate={glitchActive ? { 
+            x: [-5, 5, -5, 0], 
+            skewX: [-10, 10, -5, 0], // This adds the "Tilt" distortion
+            opacity: [1, 0.8, 1],
+            scale: [1, 1.02, 1]
+          } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
+          transition={{ duration: 0.15 }} // Super fast shake
         >
           PDFly
         </motion.h1>
       </motion.section>
 
 
-      {/* --- SECTION 2: HOW IT WORKS (HOLOGRAPHIC CARDS) --- */}
+      {/* --- SECTION 2: HOW IT WORKS --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -144,7 +143,7 @@ export default function LandingPage() {
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
           <motion.div 
-            style={styles.grid}
+            style={styles.flexGrid} // Changed to Flexbox for perfect centering
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -156,10 +155,7 @@ export default function LandingPage() {
               variants={revealVariants}
               initial="rest" whileHover="hover" animate="rest"
             >
-              <motion.div 
-                style={styles.cardContent} 
-                variants={cardHover} // Apply Holographic styles on hover
-              >
+              <motion.div style={styles.cardContent} variants={cardHover}>
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <Upload size={24} />
                 </motion.div>
@@ -174,10 +170,7 @@ export default function LandingPage() {
               variants={revealVariants}
               initial="rest" whileHover="hover" animate="rest"
             >
-              <motion.div 
-                style={styles.cardContent} 
-                variants={cardHover}
-              >
+              <motion.div style={styles.cardContent} variants={cardHover}>
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <Zap size={24} />
                 </motion.div>
@@ -192,10 +185,7 @@ export default function LandingPage() {
               variants={revealVariants}
               initial="rest" whileHover="hover" animate="rest"
             >
-              <motion.div 
-                style={styles.cardContent} 
-                variants={cardHover}
-              >
+              <motion.div style={styles.cardContent} variants={cardHover}>
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <FileText size={24} />
                 </motion.div>
@@ -239,7 +229,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 4: CTA (PLASMA BUTTON) --- */}
+      {/* --- SECTION 4: CTA --- */}
       <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
@@ -247,12 +237,7 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        <div style={{
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          textAlign: 'center' 
-        }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
             <motion.button 
@@ -350,10 +335,21 @@ const styles = {
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
+  // --- FIXED: CHANGED GRID TO FLEXBOX FOR PERFECT CENTERING ---
+  flexGrid: { 
+    display: 'flex', 
+    flexWrap: 'wrap', 
+    justifyContent: 'center', 
+    gap: '30px', 
+    width: '100%' 
+  },
   
-  // STEP CARDS
-  stepCard: { position: 'relative' }, // Container for motion
+  stepCard: { 
+    position: 'relative',
+    width: '300px', // Fixed width ensures uniform size
+    flexShrink: 0,
+  },
+  
   cardContent: { 
     padding: '40px', 
     borderRadius: '20px', 
