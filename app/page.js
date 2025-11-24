@@ -5,69 +5,53 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
 import { Orbitron, Outfit } from 'next/font/google';
 
-// 1. LOAD COOL FONTS
+// 1. LOAD FONTS
+// If you want specific fonts later, just tell me their names!
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] });
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '500', '700'] });
 
 export default function LandingPage() {
   
-  // --- NEW: LOGIC FOR FONT CHANGING EFFECT ---
+  // --- FONT CHANGING EFFECT ---
   const [currentFont, setCurrentFont] = useState(orbitron.style.fontFamily);
 
   useEffect(() => {
-    // The list of fonts to cycle through
     const fonts = [
-      orbitron.style.fontFamily, // Futuristic
-      '"Courier New", monospace', // Code style
-      '"Times New Roman", serif', // Classic style
-      '"Brush Script MT", cursive', // Handwritten
-      'Impact, sans-serif' // Bold
+      orbitron.style.fontFamily,    // Sci-Fi
+      '"Courier New", monospace',   // Code
+      '"Times New Roman", serif',   // Classic
+      'Impact, sans-serif',         // Heavy
+      '"Arial Black", sans-serif'   // Bold
     ];
 
     let index = 0;
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
-    }, 400); // Change font every 400 milliseconds
+    }, 400); // Speed of glitch (400ms)
 
     return () => clearInterval(interval);
   }, []);
-  // -------------------------------------------
 
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- HERO SECTION (Floating Logo) --- */}
+      {/* --- HERO SECTION (Minimalist) --- */}
       <section style={styles.heroSection}>
         <div style={styles.glowBg}></div>
         
-        <motion.div
-          animate={{ y: [-10, 10, -10] }} // Floating Animation
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {/* THE CHANGING FONT TITLE */}
-          <h1 style={{...styles.floatingTitle, fontFamily: currentFont}}>
+        {/* Floating animation removed. Now it stays still. */}
+        <div>
+          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
             PDFly
           </h1>
-        </motion.div>
-        
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          style={styles.heroSubtitle}
-        >
-          The Dark Mode Intelligence for your Documents.
-        </motion.p>
-
-        <div style={styles.scrollIndicator}>
-          <span style={{ fontSize: '12px', color: '#666' }}>SCROLL TO EXPLORE</span>
-          <div style={styles.verticalLine}></div>
         </div>
+        
+        {/* Subtitle and Scroll Text removed as requested */}
       </section>
 
 
-      {/* --- HOW IT WORKS (Scroll Transition) --- */}
+      {/* --- HOW IT WORKS --- */}
       <section style={styles.section}>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -104,7 +88,7 @@ export default function LandingPage() {
       </section>
 
 
-      {/* --- SOCIAL PROOF (Infinite Slider) --- */}
+      {/* --- SOCIAL PROOF --- */}
       <section style={{...styles.section, backgroundColor: '#050505'}}>
         <motion.div
           initial={{ opacity: 0 }}
@@ -115,7 +99,6 @@ export default function LandingPage() {
           
           <div style={styles.sliderContainer}>
             <div style={styles.sliderTrack}>
-               {/* Tripled list for smooth infinite loop */}
               {[...reviews, ...reviews, ...reviews].map((review, index) => (
                 <div key={index} style={styles.reviewCard}>
                   <div style={styles.reviewHeader}>
@@ -136,7 +119,7 @@ export default function LandingPage() {
       </section>
 
 
-      {/* --- FINAL CTA (The Exit) --- */}
+      {/* --- FINAL CTA --- */}
       <section style={styles.ctaSection}>
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -157,7 +140,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* CSS for infinite scroll animation */}
       <style jsx global>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
@@ -181,23 +163,20 @@ const reviews = [
 const styles = {
   container: { backgroundColor: '#000000', color: '#ffffff', minHeight: '100vh', overflowX: 'hidden' },
   
-  // HERO
+  // HERO (Cleaned up)
   heroSection: { height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' },
   
-  // Updated Floating Title Style to accept dynamic font
-  floatingTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease' },
+  // Glitch Title Style
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center' },
   
-  heroSubtitle: { fontSize: '1.2rem', color: '#666', marginTop: '20px', letterSpacing: '1px' },
   glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 70%)', zIndex: -1 },
-  scrollIndicator: { position: 'absolute', bottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' },
-  verticalLine: { width: '1px', height: '60px', backgroundColor: '#333' },
 
   // SECTIONS
   section: { minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '100px 20px' },
   contentWrapper: { maxWidth: '1000px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold' },
   
-  // GRID (How to)
+  // GRID
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px' },
   stepCard: { padding: '40px', border: '1px solid #222', borderRadius: '20px', backgroundColor: '#0a0a0a', transition: 'border-color 0.3s' },
   stepIcon: { marginBottom: '20px', opacity: 0.8 },
