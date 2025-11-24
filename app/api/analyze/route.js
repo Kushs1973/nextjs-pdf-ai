@@ -6,7 +6,14 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
-    const apiKey = formData.get('apiKey');
+
+    // --- SECURITY UPGRADE ---
+    // Instead of getting the key from the user, we get it from the Server Vault
+    const apiKey = process.env.OPENAI_API_KEY; 
+
+    if (!apiKey) {
+      return NextResponse.json({ error: "Server Configuration Error: API Key missing." }, { status: 500 });
+    }
 
     if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
@@ -18,18 +25,17 @@ export async function POST(req) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     if (isImage) {
-        // --- IMAGE HANDLING (Vision) ---
-        // Convert the image to a base64 string so OpenAI can "see" it
+        // --- IMAGE HANDLING ---
         const base64Image = buffer.toString('base64');
         const dataUrl = `data:${file.type};base64,${base64Image}`;
         
         promptContent = [
-            { type: "text", text: "Analyze this image document. Extract the information and structure it nicely." },
+            { type: "text", text: "Analyze this image document. Extract information and structure it nicely." },
             { type: "image_url", image_url: { url: dataUrl } }
         ];
 
     } else {
-        // --- PDF HANDLING (Text) ---
+        // --- PDF HANDLING ---
         const pdfParser = new PDFParser(this, 1);
         const parsedText = await new Promise((resolve, reject) => {
             pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
@@ -37,7 +43,6 @@ export async function POST(req) {
             pdfParser.parseBuffer(buffer);
         });
 
-        // Clean text
         let cleanText;
         try { cleanText = decodeURIComponent(parsedText); } 
         catch (e) { cleanText = parsedText; }
@@ -46,8 +51,7 @@ export async function POST(req) {
              return NextResponse.json({ 
                 result: `
                 <h3>⚠️ Scan Detected</h3>
-                <p>This PDF is an image scan. On this simplified version of the app, we cannot read image-PDFs.</p>
-                <p><b>Quick Fix:</b> Please upload the original <b>JPG/PNG image</b> file directly!</p>
+                <p>This PDF appears to be an image scan. Please upload the <b>Image file (JPG/PNG)</b> directly for best results!</p>
                 ` 
             });
         }
@@ -61,11 +65,10 @@ export async function POST(req) {
         `;
     }
 
-    // Send to OpenAI (Vision or Text)
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini", // GPT-4o-mini has vision capabilities built-in!
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", "content": "You are a helpful analyst. Output results in HTML structure." },
+        { role: "system", "content": "You are a helpful analyst. Output results in HTML." },
         { role: "user", "content": promptContent },
       ],
     });
