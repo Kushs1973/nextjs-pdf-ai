@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
@@ -136,7 +136,7 @@ export default function LandingPage() {
       ></div>
 
       {/* SECTION 1: HERO */}
-      <TiltSection style={styles.sectionBlock}>
+      <TiltSection style={{...styles.sectionBlock, minHeight: '85vh', justifyContent: 'center'}}>
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
           animate={glitchActive ? { x: [-5, 5, -5, 0], skewX: [-10, 10, -5, 0], opacity: [1, 0.8, 1], scale: [1, 1.02, 1] } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
@@ -200,7 +200,7 @@ export default function LandingPage() {
       </TiltSection>
 
       {/* SECTION 4: CTA */}
-      <TiltSection style={styles.sectionBlock}>
+      <TiltSection style={{...styles.sectionBlock, minHeight: '40vh', justifyContent: 'center'}}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
@@ -239,7 +239,7 @@ const reviews = [
 const styles = {
   container: {
     backgroundColor: '#121212', color: '#ffffff', minHeight: '100vh',
-    padding: '40px 20px', display: 'flex', flexDirection: 'column', gap: '60px',
+    padding: '40px 20px', display: 'flex', flexDirection: 'column', gap: '40px',
     position: 'relative', overflow: 'hidden',
   },
   gridBackground: {
@@ -253,32 +253,37 @@ const styles = {
     backgroundSize: '40px 40px', animation: 'gridMove 20s linear infinite', pointerEvents: 'none',
   },
   
-  // --- THE FIX: CENTERED LAYOUT ---
+  // --- SECTION BLOCK ---
+  // Min Height 50vh (keeps cards from being huge)
+  // Justify Content: Center (Groups content in middle of card)
   sectionBlock: {
     zIndex: 1, backgroundColor: 'rgba(255, 255, 255, 0.07)',
     backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px', border: '1px solid rgba(255, 255, 255, 0.1)',
-    minHeight: '80vh', padding: '40px',
+    minHeight: '50vh', 
+    padding: '40px',
     position: 'relative', overflow: 'hidden',
     display: 'flex', flexDirection: 'column',
-    justifyContent: 'center', // FIXED: CENTERS VERTICALLY
+    justifyContent: 'center', 
     alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
 
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' },
   
+  // WRAPPER
   contentWrapper: { 
     maxWidth: '1200px', margin: '0 auto', width: '100%',
     display: 'flex', flexDirection: 'column',
-    justifyContent: 'center', alignItems: 'center' // Centers inner content
+    justifyContent: 'center', alignItems: 'center' 
   },
   
-  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '60px', fontWeight: 'bold', color: '#fff' },
+  // --- TIGHTER SPACING HERE ---
+  // Reduced marginBottom to 25px (was 40px+) to pull content closer to title
+  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '25px', fontWeight: 'bold', color: '#fff' },
 
   flexGrid: { 
     display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px', width: '100%',
-    // Removed margins so it stays grouped with header
   },
   
   stepCardContainer: { position: 'relative', flex: '1 1 300px', maxWidth: '380px', minWidth: '280px' },
