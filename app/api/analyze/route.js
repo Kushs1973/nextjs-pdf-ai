@@ -25,17 +25,26 @@ export async function POST(req) {
       pdfParser.parseBuffer(buffer);
     });
 
-    // 3. FIX: Safe Text Cleaning
-    // Sometimes the text comes back weirdly formatted. We try to clean it,
-    // but if that fails, we just use the raw text instead of crashing.
+    // 3. Clean and Check Text
     let cleanText;
     try {
         cleanText = decodeURIComponent(parsedText);
     } catch (e) {
-        cleanText = parsedText; // Fallback to raw text if decoding fails
+        cleanText = parsedText;
     }
     
-    // Limit text length to avoid OpenAI limits
+    // SAFETY CHECK: If the PDF has less than 20 characters, it's probably an image/scan.
+    if (!cleanText || cleanText.trim().length < 20) {
+        return NextResponse.json({ 
+            result: `
+            <h3>⚠️ Could not read text</h3>
+            <p>This document appears to be a <b>scanned image</b> or photo (like an ID card or screenshot).</p>
+            <p>This version of the app can only read <b>digital text</b> (documents where you can highlight the words).</p>
+            <p>Please try uploading a standard PDF document (like a resume, contract, or ebook).</p>
+            ` 
+        });
+    }
+
     const finalText = cleanText.slice(0, 20000);
 
     // 4. Send to OpenAI
