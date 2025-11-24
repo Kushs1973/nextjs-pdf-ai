@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
+// ADDED: Github, Twitter, Linkedin imports
+import { ArrowRight, Upload, Zap, FileText, Star, User, Github, Twitter, Linkedin } from 'lucide-react';
 import { 
   Outfit, Roboto_Slab, Oswald, Zilla_Slab, DM_Sans, Fredoka, Montserrat 
 } from 'next/font/google';
@@ -50,12 +51,11 @@ const iconSpin = {
   hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
 
-// --- FIXED 3D TILT COMPONENT ---
+// --- 3D TILT COMPONENT ---
 const TiltSection = ({ children, style }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // REDUCED TILT: Changed from 5 to 1.5 degrees for subtlety
   const rotateX = useTransform(y, [-300, 300], [1.5, -1.5]); 
   const rotateY = useTransform(x, [-300, 300], [-1.5, 1.5]);
 
@@ -80,7 +80,7 @@ const TiltSection = ({ children, style }) => {
       variants={revealVariants}
       style={{ 
         perspective: 1000, 
-        width: '100%', // FIXED: Ensures it takes full width
+        width: '100%', 
         display: 'flex', 
         justifyContent: 'center' 
       }}
@@ -91,11 +91,11 @@ const TiltSection = ({ children, style }) => {
           rotateX, 
           rotateY,
           transformStyle: "preserve-3d",
-          width: '100%', // FIXED: Ensures inner card takes full width of parent
+          width: '100%',
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }} // Smoother spring
+        transition={{ type: "spring", stiffness: 200, damping: 20 }} 
       >
         {children}
       </motion.div>
@@ -259,6 +259,47 @@ export default function LandingPage() {
         </div>
       </TiltSection>
 
+      {/* --- NEW: FOOTER SECTION --- */}
+      <motion.footer 
+        style={styles.footer}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <div style={styles.footerContent}>
+          
+          {/* Left Side: Brand */}
+          <div style={styles.footerLeft}>
+            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', margin: 0, display: 'flex', alignItems: 'center', gap: '10px'}}>
+              <Zap size={24} fill="white" /> PDFly
+            </h3>
+            <p style={{color: '#888', fontSize: '0.9rem', marginTop: '10px'}}>
+              Intelligent document processing for the modern era.
+            </p>
+          </div>
+
+          {/* Right Side: Links & Socials */}
+          <div style={styles.footerRight}>
+            <div style={styles.footerLinks}>
+              <span style={styles.link}>Privacy</span>
+              <span style={styles.link}>Terms</span>
+              <span style={styles.link}>Contact</span>
+            </div>
+            <div style={styles.socials}>
+              <Github size={20} style={{cursor: 'pointer'}}/>
+              <Twitter size={20} style={{cursor: 'pointer'}}/>
+              <Linkedin size={20} style={{cursor: 'pointer'}}/>
+            </div>
+          </div>
+
+        </div>
+        
+        {/* Copyright Line */}
+        <div style={styles.copyright}>
+          © {new Date().getFullYear()} PDFly AI. All rights reserved.
+        </div>
+      </motion.footer>
+
       <style jsx global>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
@@ -298,7 +339,7 @@ const styles = {
     flexDirection: 'column',
     gap: '60px',
     position: 'relative',
-    overflow: 'hidden',
+    overflowX: 'hidden', // Prevent horizontal scroll from tilt
   },
 
   gridBackground: {
@@ -316,8 +357,8 @@ const styles = {
     pointerEvents: 'none',
   },
 
-  // Note: sectionBlock styles applied to inner motion div
   sectionBlock: {
+    zIndex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.07)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
@@ -414,5 +455,58 @@ const styles = {
     position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
     background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
     animation: 'shimmerMove 3s infinite',
+  },
+
+  // --- FOOTER STYLES ---
+  footer: {
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '40px 20px', 
+    borderTop: '1px solid rgba(255,255,255,0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '30px',
+    position: 'relative',
+    zIndex: 1
+  },
+  footerContent: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    gap: '20px'
+  },
+  footerLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px'
+  },
+  footerRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    alignItems: 'flex-end'
+  },
+  footerLinks: {
+    display: 'flex',
+    gap: '20px',
+    color: '#888',
+    fontSize: '0.9rem'
+  },
+  link: {
+    cursor: 'pointer',
+    transition: 'color 0.2s'
+  },
+  socials: {
+    display: 'flex',
+    gap: '15px',
+    color: '#fff'
+  },
+  copyright: {
+    textAlign: 'center',
+    color: '#555',
+    fontSize: '0.8rem',
+    marginTop: '20px'
   }
 };
