@@ -1,22 +1,25 @@
 "use client";
 import React, { useState } from 'react';
+import { Upload, FileText, Zap, AlertCircle } from 'lucide-react';
 
 export default function Analyzer() {
-  const [apiKey, setApiKey] = useState('');
+  // We no longer need state for apiKey
   const [file, setFile] = useState(null);
   const [analysis, setAnalysis] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
-    if (!apiKey || !file) {
-      alert("Please provide both an API Key and a document.");
+    if (!file) {
+      alert("Please upload a document first.");
       return;
     }
 
     setLoading(true);
+    setAnalysis(''); // Clear previous results
+
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('apiKey', apiKey);
+    // We do NOT send the API key from here anymore. The server already has it.
 
     try {
       const response = await fetch('/api/analyze', {
@@ -38,28 +41,27 @@ export default function Analyzer() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>📄 AI Analyst</h1>
-        <p style={styles.subtitle}>Supports: PDF • JPG • PNG</p>
-        
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>OpenAI API Key</label>
-          <input 
-            type="password" 
-            placeholder="sk-..." 
-            style={styles.input}
-            onChange={(e) => setApiKey(e.target.value)}
-          />
+        <div style={styles.header}>
+            <h1 style={styles.title}>📄 PDFly Analyst</h1>
+            <p style={styles.subtitle}>Upload your document below.</p>
         </div>
+        
+        {/* API KEY INPUT IS REMOVED */}
 
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Upload Document</label>
-          {/* UPDATED: Now accepts Images too! */}
+        <div style={styles.uploadBox}>
           <input 
             type="file" 
             accept=".pdf, .png, .jpg, .jpeg"
-            style={styles.fileInput}
+            style={styles.hiddenInput}
+            id="fileInput"
             onChange={(e) => setFile(e.target.files[0])}
           />
+          <label htmlFor="fileInput" style={styles.uploadLabel}>
+            <Upload size={40} color="#666" style={{marginBottom: '10px'}}/>
+            <p style={{margin: 0, fontWeight: '500'}}>
+              {file ? file.name : "Click to Upload PDF or Image"}
+            </p>
+          </label>
         </div>
 
         <button 
@@ -67,11 +69,18 @@ export default function Analyzer() {
           style={loading ? styles.buttonDisabled : styles.button}
           disabled={loading}
         >
-          {loading ? "Analyzing..." : "Start Analysis"}
+          {loading ? (
+             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
+               <Zap size={18} className="animate-pulse"/> Analyzing...
+             </div>
+          ) : "Start Analysis"}
         </button>
 
         {analysis && (
           <div style={styles.resultArea}>
+            <div style={styles.resultHeader}>
+                <FileText size={18} color="#fff"/> Analysis Result
+            </div>
             <div dangerouslySetInnerHTML={{ __html: analysis }} />
           </div>
         )}
@@ -81,15 +90,19 @@ export default function Analyzer() {
 }
 
 const styles = {
-  container: { minHeight: '100vh', backgroundColor: '#0a0a0a', color: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'sans-serif', padding: '20px' },
-  card: { width: '100%', maxWidth: '600px', backgroundColor: '#171717', borderRadius: '12px', padding: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.5)', border: '1px solid #333' },
-  title: { fontSize: '24px', marginBottom: '10px', textAlign: 'center' },
-  subtitle: { color: '#888', textAlign: 'center', marginBottom: '30px', fontSize: '14px' },
-  inputGroup: { marginBottom: '20px' },
-  label: { display: 'block', marginBottom: '8px', fontSize: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' },
-  input: { width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #333', backgroundColor: '#262626', color: '#fff', fontSize: '14px', outline: 'none' },
-  fileInput: { color: '#fff', fontSize: '14px' },
-  button: { width: '100%', padding: '14px', borderRadius: '6px', border: 'none', backgroundColor: '#fff', color: '#000', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px', transition: '0.2s' },
-  buttonDisabled: { width: '100%', padding: '14px', borderRadius: '6px', border: 'none', backgroundColor: '#444', color: '#888', cursor: 'not-allowed', marginTop: '10px' },
-  resultArea: { marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #333', lineHeight: '1.6', color: '#ddd' }
+  container: { minHeight: '100vh', backgroundColor: '#121212', color: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'sans-serif', padding: '20px' },
+  card: { width: '100%', maxWidth: '700px', backgroundColor: '#1F1F1F', borderRadius: '24px', padding: '40px', boxShadow: '0 20px 60px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' },
+  header: { textAlign: 'center', marginBottom: '30px' },
+  title: { fontSize: '28px', marginBottom: '8px', fontWeight: 'bold' },
+  subtitle: { color: '#888', fontSize: '15px' },
+  
+  uploadBox: { marginBottom: '30px', position: 'relative' },
+  hiddenInput: { display: 'none' },
+  uploadLabel: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', border: '2px dashed #444', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', backgroundColor: 'rgba(255,255,255,0.02)', color: '#aaa' },
+  
+  button: { width: '100%', padding: '16px', borderRadius: '12px', border: 'none', backgroundColor: '#fff', color: '#000', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer', marginTop: '10px', transition: '0.2s' },
+  buttonDisabled: { width: '100%', padding: '16px', borderRadius: '12px', border: 'none', backgroundColor: '#444', color: '#888', cursor: 'not-allowed', marginTop: '10px' },
+  
+  resultArea: { marginTop: '40px', padding: '30px', backgroundColor: '#000', borderRadius: '16px', border: '1px solid #333', lineHeight: '1.7', color: '#e0e0e0' },
+  resultHeader: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: '#888', borderBottom: '1px solid #333', paddingBottom: '15px' }
 };
