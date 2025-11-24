@@ -1,30 +1,31 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import PDFParser from 'pdf2json';
+
+// 1. Import the PDF Tool using the "Require" trick for stability
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdf = require('pdf-parse');
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
+    
+    // Get API Key from Server Settings
     const apiKey = process.env.OPENAI_API_KEY; 
 
-    // 1. Basic Checks
-    if (!apiKey) {
-      return NextResponse.json({ error: "Server Configuration Error: API Key missing." }, { status: 500 });
-    }
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-    }
+    if (!apiKey) return NextResponse.json({ error: "Server Error: API Key missing." }, { status: 500 });
+    if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
     const client = new OpenAI({ apiKey: apiKey });
     let promptContent = "";
     
-    // 2. Prepare File
     const buffer = Buffer.from(await file.arrayBuffer());
     const isImage = file.type.startsWith('image/');
 
     if (isImage) {
-        // --- IMAGE HANDLING (Vision) ---
+        // --- IMAGE PATH (Vision AI) ---
+        // If user uploads a JPG/PNG, we use GPT-5's eyes.
         const base64Image = buffer.toString('base64');
         const dataUrl = `data:${file.type};base64,${base64Image}`;
         
@@ -34,27 +35,38 @@ export async function POST(req) {
         ];
 
     } else {
-        // --- PDF HANDLING (Text) ---
-        const pdfParser = new PDFParser(this, 1);
-        
-        const parsedText = await new Promise((resolve, reject) => {
-            pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
-            pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
-            pdfParser.parseBuffer(buffer);
-        });
+        // --- PDF PATH (Text AI) ---
+        let pdfText = "";
+        try {
+            const data = await pdf(buffer);
+            pdfText = data.text;
+        } catch (e) {
+            console.error("PDF Parse Error:", e);
+            pdfText = ""; 
+        }
 
-        let cleanText;
-        try { cleanText = decodeURIComponent(parsedText); } 
-        catch (e) { cleanText = parsedText; }
-
-        if (!cleanText || cleanText.trim().length < 20) {
+        // --- THE SMART CHECK ---
+        // If the PDF has less than 50 letters, it is almost certainly a photo scan.
+        if (!pdfText || pdfText.trim().length < 50) {
              return NextResponse.json({ 
                 result: `
-                <h3>⚠️ Scan Detected</h3>
-                <p>This PDF appears to be an image scan. Please upload the <b>Image file (JPG/PNG)</b> directly for best results!</p>
+                <h3>⚠️ Image-PDF Detected</h3>
+                <p>The AI found <b>no text</b> in this PDF. This usually means it is a <b>scanned photo</b> saved as a PDF.</p>
+                <br/>
+                <div style="background: #222; padding: 15px; border-radius: 8px; border: 1px solid #444;">
+                  <p style="margin:0; font-weight:bold;">✅ How to fix:</p>
+                  <ul style="margin-top:10px; margin-bottom:0;">
+                    <li>Take a <b>Screenshot</b> of this document.</li>
+                    <li>Upload the screenshot (<b>.JPG</b> or <b>.PNG</b>) instead.</li>
+                  </ul>
+                </div>
+                <p style="margin-top:15px; font-size: 0.9em; color: #888;">Because you uploaded a PDF, we tried to read the text code. If you upload an Image, we will use the AI's Vision Eyes.</p>
                 ` 
             });
         }
+        
+        // If text exists, clean it up and prepare it for AI
+        let cleanText = pdfText.replace(/[^\x20-\x7E\n]/g, ''); // Remove weird symbols
         
         promptContent = `
         Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
@@ -65,9 +77,9 @@ export async function POST(req) {
         `;
     }
 
-    // 3. Send to OpenAI (THE GPT-5 UPGRADE)
+    // 3. Send to OpenAI (Using the new GPT-5-mini)
     const completion = await client.chat.completions.create({
-      model: "gpt-5-mini", // <--- THE NEWEST ENGINE
+      model: "gpt-5-mini", 
       messages: [
         { role: "system", "content": "You are a helpful analyst. Output results in HTML." },
         { role: "user", "content": promptContent },
