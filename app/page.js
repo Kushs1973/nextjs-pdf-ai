@@ -3,32 +3,46 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
-import { Orbitron, Outfit } from 'next/font/google';
+import { 
+  Outfit, 
+  Roboto_Slab, 
+  Oswald, 
+  Zilla_Slab, 
+  DM_Sans, 
+  Fredoka, 
+  Montserrat 
+} from 'next/font/google';
 
-// 1. LOAD FONTS
-// If you want specific fonts later, just tell me their names!
-const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700', '900'] });
+// 1. LOAD THE FONT LOOKALIKES
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '500', '700'] });
+const inputSerifLike = Roboto_Slab({ subsets: ['latin'], weight: ['400', '700'] });
+const minettoLike = Oswald({ subsets: ['latin'], weight: ['500'] });
+const mortiseLike = Zilla_Slab({ subsets: ['latin'], weight: ['700'] });
+const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
+const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
+const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
 export default function LandingPage() {
   
   // --- FONT CHANGING EFFECT ---
-  const [currentFont, setCurrentFont] = useState(orbitron.style.fontFamily);
+  const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
 
   useEffect(() => {
+    // The Font Stack based on your request
     const fonts = [
-      orbitron.style.fontFamily,    // Sci-Fi
-      '"Courier New", monospace',   // Code
-      '"Times New Roman", serif',   // Classic
-      'Impact, sans-serif',         // Heavy
-      '"Arial Black", sans-serif'   // Bold
+      inputSerifLike.style.fontFamily, // Input Serif lookalike
+      minettoLike.style.fontFamily,    // Minetto lookalike
+      mortiseLike.style.fontFamily,    // Mortise lookalike
+      sonarLike.style.fontFamily,      // Sonar lookalike
+      mokokoLike.style.fontFamily,     // Mokoko lookalike
+      avenirLike.style.fontFamily      // Avenir lookalike
     ];
 
     let index = 0;
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
-    }, 400); // Speed of glitch (400ms)
+    }, 400); // 400ms speed
 
     return () => clearInterval(interval);
   }, []);
@@ -36,18 +50,20 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- HERO SECTION (Minimalist) --- */}
+      {/* --- HERO SECTION --- */}
       <section style={styles.heroSection}>
         <div style={styles.glowBg}></div>
         
-        {/* Floating animation removed. Now it stays still. */}
-        <div>
+        {/* ANIMATION: Fades in from Top (-100px) to Center (0px) */}
+        <motion.div
+          initial={{ opacity: 0, y: -100 }} 
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >
           <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
             PDFly
           </h1>
-        </div>
-        
-        {/* Subtitle and Scroll Text removed as requested */}
+        </motion.div>
       </section>
 
 
@@ -163,7 +179,7 @@ const reviews = [
 const styles = {
   container: { backgroundColor: '#000000', color: '#ffffff', minHeight: '100vh', overflowX: 'hidden' },
   
-  // HERO (Cleaned up)
+  // HERO
   heroSection: { height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' },
   
   // Glitch Title Style
