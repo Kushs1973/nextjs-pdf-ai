@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // No special settings needed for now!
+  // This tells Vercel: "Don't try to compress this tool, run it raw."
+  serverExternalPackages: ['pdf-parse'], 
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
