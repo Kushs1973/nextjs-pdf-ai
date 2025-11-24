@@ -29,25 +29,38 @@ export async function POST(req) {
 
     } else {
         // --- PDF PATH (Text AI) ---
-        const pdfParser = new PDFParser(this, 1);
+        // Use 'null' context to avoid 'this' issues
+        const pdfParser = new PDFParser(null, 1);
         
         const parsedText = await new Promise((resolve, reject) => {
             pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
             
-            // --- THE FIX IS HERE ---
-            // We ask the PARSER to get the text, not the data object.
-            pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
+            // --- THE FIX: MANUAL EXTRACTION ---
+            // We do not use .getRawTextContent(). We parse the JSON structure ourselves.
+            pdfParser.on("pdfParser_dataReady", (pdfData) => {
+                try {
+                    // Loop through Pages -> Texts -> R (Runs) -> T (Text)
+                    // The text is URI-encoded, so we decode it.
+                    const text = pdfData.Pages.reduce((pageAcc, page) => {
+                        return pageAcc + page.Texts.reduce((textAcc, textItem) => {
+                            return textAcc + decodeURIComponent(textItem.R[0].T) + " ";
+                        }, " ") + "\n";
+                    }, "");
+                    
+                    resolve(text);
+                } catch (e) {
+                    console.error("Manual Parse Error:", e);
+                    resolve(""); // If structure is weird, return empty so we trigger the image warning
+                }
+            });
             
             pdfParser.parseBuffer(buffer);
         });
 
-        // Clean text (Fixing URL encoding issues)
-        let cleanText;
-        try { cleanText = decodeURIComponent(parsedText); } 
-        catch (e) { cleanText = parsedText; }
+        // Clean text
+        let cleanText = parsedText.replace(/[^\x20-\x7E\n]/g, '');
 
         // --- THE SMART CHECK ---
-        // Count real letters/numbers. If less than 50, it's a scan.
         const alphanumericCount = (cleanText.match(/[a-zA-Z0-9]/g) || []).length;
 
         if (alphanumericCount < 50) {
@@ -79,7 +92,7 @@ export async function POST(req) {
 
     // 3. Send to OpenAI
     const completion = await client.chat.completions.create({
-      model: "gpt-5-mini", // Using the latest model
+      model: "gpt-5-mini", 
       messages: [
         { role: "system", "content": "You are a helpful analyst. Output results in HTML." },
         { role: "user", "content": promptContent },
