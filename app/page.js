@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
@@ -22,14 +22,11 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- REVEAL ANIMATION ---
+// --- ANIMATION VARIANTS ---
 const revealVariants = {
   hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
-    opacity: 1, 
-    y: 0, 
-    filter: 'blur(0px)', 
-    scale: 1, 
+    opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, 
     transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
   }
 };
@@ -44,9 +41,13 @@ const staggerContainer = {
 
 export default function LandingPage() {
   
-  // --- FONT EFFECT ---
+  // --- FONT EFFECT STATE ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
+  
+  // --- VANTA 3D EFFECT REF ---
+  const vantaRef = useRef(null);
 
+  // 1. Handle Font Switching
   useEffect(() => {
     const fonts = [
       inputSerifLike.style.fontFamily,
@@ -64,21 +65,62 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // 2. Handle Vanta Globe Effect
+  useEffect(() => {
+    let vantaEffect = null;
+    
+    // We check if the script is loaded and the ref exists
+    const initVanta = () => {
+      if (!vantaEffect && window.VANTA && vantaRef.current) {
+        vantaEffect = window.VANTA.GLOBE({
+          el: vantaRef.current, // Attach to the Hero Section
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.00,
+          minWidth: 200.00,
+          scale: 1.00,
+          scaleMobile: 1.00,
+          color: 0xffffff,       // The Dots Color (White)
+          backgroundColor: 0x1F1F1F, // MATCHES THE CARD GREY
+          size: 1.50             // Globe Size
+        });
+      }
+    };
+
+    // Retry a few times in case script is slow to load
+    const timeout = setTimeout(initVanta, 100);
+    const timeout2 = setTimeout(initVanta, 500);
+    const timeout3 = setTimeout(initVanta, 1000);
+
+    return () => {
+      if (vantaEffect) vantaEffect.destroy();
+      clearTimeout(timeout);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+    };
+  }, []);
+
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- SECTION 1: HERO (PDFly) --- */}
+      {/* --- SECTION 1: HERO (PDFly + 3D GLOBE) --- */}
       <motion.section 
-        style={styles.sectionBlock}
+        ref={vantaRef} // <--- THE GLOBE LIVES HERE
+        style={{...styles.sectionBlock, minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        <div style={styles.glowBg}></div>
-        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
-          PDFly
-        </h1>
+        {/* Removed glowBg because Vanta replaces it */}
+        
+        {/* Z-Index ensures text sits ON TOP of the globe */}
+        <div style={{ zIndex: 10, position: 'relative', pointerEvents: 'none' }}>
+          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+            PDFly
+          </h1>
+        </div>
       </motion.section>
 
 
@@ -168,7 +210,6 @@ export default function LandingPage() {
           textAlign: 'center' 
         }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
-          {/* UPDATED LINK: No Underline */}
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
             <motion.button 
               whileHover={{ scale: 1.05, backgroundColor: '#fff', color: '#000' }}
@@ -207,17 +248,16 @@ const styles = {
     backgroundColor: '#000000',
     color: '#ffffff',
     minHeight: '100vh',
-    padding: '40px 20px', // Outer padding
+    padding: '40px 20px', 
     display: 'flex',
     flexDirection: 'column',
     gap: '60px',
   },
 
-  // --- RECTANGLE STYLE ADJUSTED ---
+  // --- RECTANGLE STYLE ---
   sectionBlock: {
-    backgroundColor: '#1F1F1F', // Normal Grey
+    backgroundColor: '#1F1F1F', 
     borderRadius: '40px',
-    // FIXED: Changed to 80vh so it fits better on screen without cutoff
     minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
@@ -231,8 +271,7 @@ const styles = {
 
   // HERO STYLES
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
-  glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)', zIndex: -1 },
-
+  
   // COMMON SECTION STYLES
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
@@ -256,5 +295,5 @@ const styles = {
 
   // CTA
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
-  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' }, // Added textDecoration none here too as backup
+  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' },
 };
