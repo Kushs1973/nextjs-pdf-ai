@@ -9,7 +9,7 @@ export default function Analyzer() {
 
   const handleAnalyze = async () => {
     if (!apiKey || !file) {
-      alert("Please provide both an API Key and a PDF file.");
+      alert("Please provide both an API Key and a document.");
       return;
     }
 
@@ -38,8 +38,8 @@ export default function Analyzer() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>📄 AI PDF Analyst</h1>
-        <p style={styles.subtitle}>Minimalist. Structured. Intelligent.</p>
+        <h1 style={styles.title}>📄 AI Analyst</h1>
+        <p style={styles.subtitle}>Supports: PDF • JPG • PNG</p>
         
         <div style={styles.inputGroup}>
           <label style={styles.label}>OpenAI API Key</label>
@@ -53,9 +53,10 @@ export default function Analyzer() {
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>Upload Document</label>
+          {/* UPDATED: Now accepts Images too! */}
           <input 
             type="file" 
-            accept=".pdf"
+            accept=".pdf, .png, .jpg, .jpeg"
             style={styles.fileInput}
             onChange={(e) => setFile(e.target.files[0])}
           />
