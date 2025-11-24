@@ -22,27 +22,57 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
+// --- APPLE STYLE ANIMATION VARIANTS ---
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3, // Delay between each card appearing
+      delayChildren: 0.2,
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 50,              // Start slightly lower
+    filter: 'blur(10px)', // Start blurry (The Apple Touch)
+    scale: 0.95         // Start slightly smaller
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)', // Become clear
+    scale: 1,
+    transition: { 
+      duration: 0.8, 
+      ease: [0.22, 1, 0.36, 1] // Custom "Apple-like" easing curve
+    }
+  }
+};
+
 export default function LandingPage() {
   
   // --- FONT CHANGING EFFECT ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
 
   useEffect(() => {
-    // The Font Stack based on your request
     const fonts = [
-      inputSerifLike.style.fontFamily, // Input Serif lookalike
-      minettoLike.style.fontFamily,    // Minetto lookalike
-      mortiseLike.style.fontFamily,    // Mortise lookalike
-      sonarLike.style.fontFamily,      // Sonar lookalike
-      mokokoLike.style.fontFamily,     // Mokoko lookalike
-      avenirLike.style.fontFamily      // Avenir lookalike
+      inputSerifLike.style.fontFamily,
+      minettoLike.style.fontFamily,
+      mortiseLike.style.fontFamily,
+      sonarLike.style.fontFamily,
+      mokokoLike.style.fontFamily,
+      avenirLike.style.fontFamily
     ];
 
     let index = 0;
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
-    }, 400); // 400ms speed
+    }, 400);
 
     return () => clearInterval(interval);
   }, []);
@@ -54,7 +84,6 @@ export default function LandingPage() {
       <section style={styles.heroSection}>
         <div style={styles.glowBg}></div>
         
-        {/* ANIMATION: Fades in from Top (-100px) to Center (0px) */}
         <motion.div
           initial={{ opacity: 0, y: -100 }} 
           animate={{ opacity: 1, y: 0 }}
@@ -67,40 +96,48 @@ export default function LandingPage() {
       </section>
 
 
-      {/* --- HOW IT WORKS --- */}
+      {/* --- HOW IT WORKS (Apple Style Animation) --- */}
       <section style={styles.section}>
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          style={styles.contentWrapper}
-        >
-          <h2 style={styles.sectionHeader}>How It Works</h2>
+        <div style={styles.contentWrapper}>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            style={styles.sectionHeader}
+          >
+            How It Works
+          </motion.h2>
           
-          <div style={styles.grid}>
+          <motion.div 
+            style={styles.grid}
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }} // Triggers when 30% visible
+          >
             {/* Step 1 */}
-            <div style={styles.stepCard}>
+            <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><Upload size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>1. Upload</h3>
               <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
-            </div>
+            </motion.div>
 
             {/* Step 2 */}
-            <div style={styles.stepCard}>
+            <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><Zap size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>2. Analyze</h3>
               <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
-            </div>
+            </motion.div>
 
             {/* Step 3 */}
-            <div style={styles.stepCard}>
+            <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><FileText size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>3. Insight</h3>
               <p style={styles.stepDesc}>Get structured summaries and executive briefs.</p>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
       </section>
 
 
