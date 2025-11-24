@@ -22,23 +22,15 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- THE APPLE ANIMATION SETTINGS ---
+// --- APPLE REVEAL ANIMATION ---
 const revealVariants = {
-  hidden: { 
-    opacity: 0, 
-    y: 50,              // Start 50px lower
-    filter: 'blur(10px)', // Start blurry
-    scale: 0.98         // Start slightly smaller
-  },
+  hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
     opacity: 1, 
-    y: 0,               // Move to final position
-    filter: 'blur(0px)',  // Become clear
-    scale: 1,           // Scale to normal
-    transition: { 
-      duration: 0.8, 
-      ease: [0.22, 1, 0.36, 1] // The "Apple" Easing Curve
-    }
+    y: 0, 
+    filter: 'blur(0px)', 
+    scale: 1, 
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
   }
 };
 
@@ -75,38 +67,35 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- BLOCK 1: HERO (PDFly) --- */}
-      <motion.section 
-        style={{...styles.sectionBlock, minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={revealVariants} // <--- Apply Apple Animation
-      >
-        <div style={styles.glowBg}></div>
-        
-        <div>
-          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
-            PDFly
-          </h1>
-        </div>
-      </motion.section>
-
-
-      {/* --- BLOCK 2: HOW IT WORKS --- */}
+      {/* --- SECTION 1: HERO (Full Screen Card) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={revealVariants} // <--- Apply Apple Animation
+        viewport={{ once: true, amount: 0.5 }}
+        variants={revealVariants}
+      >
+        <div style={styles.glowBg}></div>
+        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+          PDFly
+        </h1>
+      </motion.section>
+
+
+      {/* --- SECTION 2: HOW IT WORKS (Full Screen Card) --- */}
+      <motion.section 
+        style={styles.sectionBlock}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={revealVariants}
       >
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
           <motion.div 
             style={styles.grid}
-            variants={staggerContainer} // Stagger the cards inside
+            variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -133,13 +122,13 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- BLOCK 3: SOCIAL PROOF --- */}
+      {/* --- SECTION 3: SOCIAL PROOF (Full Screen Card) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        variants={revealVariants} // <--- Apply Apple Animation
+        variants={revealVariants}
       >
         <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
         
@@ -164,15 +153,20 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- BLOCK 4: CTA --- */}
+      {/* --- SECTION 4: CTA (Full Screen Card, Perfectly Centered) --- */}
       <motion.section 
-        style={{...styles.sectionBlock, minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+        style={{...styles.sectionBlock, justifyContent: 'center'}} // Forces vertical centering
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.5 }}
-        variants={revealVariants} // <--- Apply Apple Animation
+        variants={revealVariants}
       >
-        <div style={{textAlign: 'center'}}>
+        <div style={{
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', // Forces horizontal centering
+          textAlign: 'center' 
+        }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer">
             <motion.button 
@@ -192,6 +186,8 @@ export default function LandingPage() {
           100% { transform: translateX(-50%); }
         }
         body { margin: 0; background-color: #000; }
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
     </div>
   );
@@ -211,48 +207,54 @@ const styles = {
     backgroundColor: '#000000',
     color: '#ffffff',
     minHeight: '100vh',
-    padding: '20px', // Outer gap
+    padding: '40px 20px', // Top/Bottom padding
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px', // GAP BETWEEN THE RECTANGLES
+    gap: '60px', // BIG GAP between the "pages"
   },
 
   // --- THE SEPARATE RECTANGLES STYLE ---
   sectionBlock: {
-    backgroundColor: '#080808', // Very dark grey
-    borderRadius: '30px',       // Rounded corners
-    border: '1px solid #222',   // Subtle border
-    padding: '60px 20px',       // Breathing room inside the rectangle
+    backgroundColor: '#1F1F1F', // Lighter "Normal" Grey
+    borderRadius: '40px',       // Smoother curves
+    // Border Removed for cleaner look
+    height: '90vh',             // Takes up 90% of the screen height
+    padding: '40px',
     position: 'relative',
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',   // Vertically centers content inside
+    alignItems: 'center',       // Horizontally centers content inside
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)', // Subtle shadow
   },
 
   // HERO STYLES
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
-  glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)', zIndex: -1, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' },
+  glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%)', zIndex: -1 },
 
   // COMMON SECTION STYLES
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
   // GRID
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' },
-  stepCard: { padding: '40px', border: '1px solid #333', borderRadius: '20px', backgroundColor: '#000', transition: 'border-color 0.3s' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
+  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: '#2a2a2a', transition: 'transform 0.3s' }, // Slightly lighter than background
   stepIcon: { marginBottom: '20px', opacity: 0.9 },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
-  stepDesc: { color: '#ddd', lineHeight: '1.6', fontSize: '1.1rem' },
+  stepDesc: { color: '#ccc', lineHeight: '1.6', fontSize: '1.1rem' },
 
   // SLIDER
   sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
-  reviewCard: { width: '300px', padding: '25px', backgroundColor: '#000', borderRadius: '15px', border: '1px solid #333', flexShrink: 0 },
+  reviewCard: { width: '300px', padding: '25px', backgroundColor: '#2a2a2a', borderRadius: '15px', flexShrink: 0 },
   reviewHeader: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' },
-  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#444', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
   stars: { display: 'flex', gap: '2px', marginTop: '2px' },
-  reviewText: { color: '#ccc', fontStyle: 'italic', fontSize: '15px' },
+  reviewText: { color: '#ddd', fontStyle: 'italic', fontSize: '15px' },
 
   // CTA
-  ctaHeadline: { fontSize: '3rem', marginBottom: '40px', color: '#fff' },
-  finalButton: { padding: '20px 50px', fontSize: '1.2rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px' },
+  ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
+  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold' },
 };
