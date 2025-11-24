@@ -10,60 +10,63 @@ export async function POST(req) {
 
     if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
-    // 1. Convert file to Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // 2. Parse PDF
-    const pdfParser = new PDFParser(this, 1);
-
-    const parsedText = await new Promise((resolve, reject) => {
-      pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
-      pdfParser.on("pdfParser_dataReady", (pdfData) => {
-        resolve(pdfParser.getRawTextContent());
-      });
-      pdfParser.parseBuffer(buffer);
-    });
-
-    // 3. Clean and Check Text
-    let cleanText;
-    try {
-        cleanText = decodeURIComponent(parsedText);
-    } catch (e) {
-        cleanText = parsedText;
-    }
-    
-    // SAFETY CHECK: If the PDF has less than 20 characters, it's probably an image/scan.
-    if (!cleanText || cleanText.trim().length < 20) {
-        return NextResponse.json({ 
-            result: `
-            <h3>⚠️ Could not read text</h3>
-            <p>This document appears to be a <b>scanned image</b> or photo (like an ID card or screenshot).</p>
-            <p>This version of the app can only read <b>digital text</b> (documents where you can highlight the words).</p>
-            <p>Please try uploading a standard PDF document (like a resume, contract, or ebook).</p>
-            ` 
-        });
-    }
-
-    const finalText = cleanText.slice(0, 20000);
-
-    // 4. Send to OpenAI
     const client = new OpenAI({ apiKey: apiKey });
+    let promptContent = "";
     
-    const prompt = `
-    Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
-    - Executive Summary
-    - Key Points
-    - Actionable Insights
-    
-    TEXT: ${finalText}
-    `;
+    // Check if the file is an Image or a PDF
+    const isImage = file.type.startsWith('image/');
+    const buffer = Buffer.from(await file.arrayBuffer());
 
+    if (isImage) {
+        // --- IMAGE HANDLING (Vision) ---
+        // Convert the image to a base64 string so OpenAI can "see" it
+        const base64Image = buffer.toString('base64');
+        const dataUrl = `data:${file.type};base64,${base64Image}`;
+        
+        promptContent = [
+            { type: "text", text: "Analyze this image document. Extract the information and structure it nicely." },
+            { type: "image_url", image_url: { url: dataUrl } }
+        ];
+
+    } else {
+        // --- PDF HANDLING (Text) ---
+        const pdfParser = new PDFParser(this, 1);
+        const parsedText = await new Promise((resolve, reject) => {
+            pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
+            pdfParser.on("pdfParser_dataReady", (pdfData) => resolve(pdfData.getRawTextContent()));
+            pdfParser.parseBuffer(buffer);
+        });
+
+        // Clean text
+        let cleanText;
+        try { cleanText = decodeURIComponent(parsedText); } 
+        catch (e) { cleanText = parsedText; }
+
+        if (!cleanText || cleanText.trim().length < 20) {
+             return NextResponse.json({ 
+                result: `
+                <h3>⚠️ Scan Detected</h3>
+                <p>This PDF is an image scan. On this simplified version of the app, we cannot read image-PDFs.</p>
+                <p><b>Quick Fix:</b> Please upload the original <b>JPG/PNG image</b> file directly!</p>
+                ` 
+            });
+        }
+        
+        promptContent = `
+        Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
+        - Executive Summary
+        - Key Points
+        - Actionable Insights
+        TEXT: ${cleanText.slice(0, 20000)}
+        `;
+    }
+
+    // Send to OpenAI (Vision or Text)
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini", // GPT-4o-mini has vision capabilities built-in!
       messages: [
-        { role: "system", "content": "You are a helpful analyst." },
-        { role: "user", "content": prompt },
+        { role: "system", "content": "You are a helpful analyst. Output results in HTML structure." },
+        { role: "user", "content": promptContent },
       ],
     });
 
