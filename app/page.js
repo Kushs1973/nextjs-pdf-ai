@@ -22,7 +22,7 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- ANIMATION VARIANTS (RESTORED) ---
+// --- ANIMATION VARIANTS ---
 const revealVariants = {
   hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
@@ -43,8 +43,12 @@ export default function LandingPage() {
   
   // --- FONT EFFECT ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
+  
+  // --- SPOTLIGHT STATE ---
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    // 1. Font Interval
     const fonts = [
       inputSerifLike.style.fontFamily,
       minettoLike.style.fontFamily,
@@ -58,28 +62,47 @@ export default function LandingPage() {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
     }, 400);
-    return () => clearInterval(interval);
+
+    // 2. Mouse Tracking
+    const updateMousePosition = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', updateMousePosition);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('mousemove', updateMousePosition);
+    };
   }, []);
 
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- BACKGROUND GRID --- */}
+      {/* --- BACKGROUND LAYERS --- */}
+      {/* 1. Base Grid (Dim) */}
       <div style={styles.gridBackground}></div>
+      
+      {/* 2. SPOTLIGHT LAYER (Bright Grid where mouse is) */}
+      <div 
+        style={{
+          ...styles.spotlightLayer,
+          maskImage: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`,
+          WebkitMaskImage: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`,
+        }}
+      ></div>
 
       {/* --- SECTION 1: HERO --- */}
-      {/* Animation: Immediate Drop-in (ignoring scroll) */}
-      <section style={styles.sectionBlock}>
-        <motion.div
-          initial={{ opacity: 0, y: -100, filter: 'blur(10px)' }} 
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-        >
-          <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
-            PDFly
-          </h1>
-        </motion.div>
-      </section>
+      <motion.section 
+        style={styles.sectionBlock}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.5 }}
+        variants={revealVariants}
+      >
+        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+          PDFly
+        </h1>
+      </motion.section>
 
 
       {/* --- SECTION 2: HOW IT WORKS --- */}
@@ -87,7 +110,7 @@ export default function LandingPage() {
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
+        viewport={{ once: true, amount: 0.3 }}
         variants={revealVariants}
       >
         <div style={styles.contentWrapper}>
@@ -127,7 +150,7 @@ export default function LandingPage() {
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
+        viewport={{ once: true, amount: 0.3 }}
         variants={revealVariants}
       >
         <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
@@ -158,7 +181,7 @@ export default function LandingPage() {
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }} // Trigger earlier
+        viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
         <div style={{
@@ -170,11 +193,14 @@ export default function LandingPage() {
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
             <motion.button 
-              whileHover={{ scale: 1.05, backgroundColor: '#fff', color: '#000' }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               style={styles.finalButton}
             >
-              Launch PDFly <ArrowRight size={20} />
+              <div style={styles.shimmer}></div> {/* THE SHIMMER EFFECT */}
+              <span style={{zIndex: 2, display: 'flex', alignItems: 'center', gap: '10px'}}>
+                Launch PDFly <ArrowRight size={20} />
+              </span>
             </motion.button>
           </Link>
         </div>
@@ -188,6 +214,10 @@ export default function LandingPage() {
         @keyframes gridMove {
           0% { background-position: 0 0; }
           100% { background-position: 40px 40px; }
+        }
+        @keyframes shimmerMove {
+          0% { transform: translateX(-150%); }
+          100% { transform: translateX(150%); }
         }
         body { margin: 0; background-color: #121212; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -204,10 +234,10 @@ const reviews = [
   { name: "Priya K.", text: "Cleanest UI I have ever seen." },
 ];
 
-// STYLES (Your Perfect Colors)
+// STYLES
 const styles = {
   container: {
-    backgroundColor: '#121212', // DEEP CHARCOAL
+    backgroundColor: '#121212',
     color: '#ffffff',
     minHeight: '100vh',
     padding: '40px 20px', 
@@ -218,27 +248,42 @@ const styles = {
     overflow: 'hidden',
   },
 
+  // --- 1. DARK GRID (Background) ---
   gridBackground: {
     position: 'fixed',
     top: 0, left: 0, width: '100vw', height: '100vh',
     zIndex: 0,
     backgroundImage: `
-      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
     `,
     backgroundSize: '40px 40px',
     animation: 'gridMove 20s linear infinite',
-    opacity: 0.5,
+    opacity: 0.3,
+  },
+
+  // --- 2. SPOTLIGHT GRID (Bright Overlay) ---
+  spotlightLayer: {
+    position: 'fixed',
+    top: 0, left: 0, width: '100vw', height: '100vh',
+    zIndex: 0, // Same level as background, but masked
+    backgroundImage: `
+      linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)
+    `,
+    backgroundSize: '40px 40px',
+    animation: 'gridMove 20s linear infinite',
+    pointerEvents: 'none', // Allow clicking through it
   },
 
   sectionBlock: {
     zIndex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.07)', // Brighter Glass
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    minHeight: '80vh', // Perfect height for breathing room
+    minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
     overflow: 'hidden',
@@ -272,5 +317,31 @@ const styles = {
   reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' },
 
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
-  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' },
+  
+  // --- THE NEW BUTTON WITH SHIMMER ---
+  finalButton: { 
+    padding: '25px 60px', 
+    fontSize: '1.5rem', 
+    backgroundColor: '#fff', 
+    color: '#000', 
+    border: 'none', 
+    borderRadius: '100px', 
+    cursor: 'pointer', 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '15px', 
+    fontWeight: 'bold', 
+    textDecoration: 'none',
+    position: 'relative', // Needed for shimmer
+    overflow: 'hidden'    // Contain the shimmer
+  },
+  
+  // The Beam of Light
+  shimmer: {
+    position: 'absolute',
+    top: 0, left: 0,
+    width: '100%', height: '100%',
+    background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
+    animation: 'shimmerMove 3s infinite',
+  }
 };
