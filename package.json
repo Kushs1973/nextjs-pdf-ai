@@ -15,5 +15,6 @@
     "openai": "latest",
     "pdf2json": "latest",
     "lucide-react": "latest"
+    "framer-motion": "latest"
   }
 }
