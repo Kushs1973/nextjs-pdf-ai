@@ -39,16 +39,35 @@ const staggerContainer = {
   }
 };
 
+// --- NEW: HOLOGRAPHIC CARD HOVER EFFECT ---
+const cardHover = {
+  rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
+  hover: { 
+    scale: 1.05, 
+    borderColor: "rgba(59, 130, 246, 0.5)", // Electric Blue Border
+    backgroundColor: "rgba(59, 130, 246, 0.1)", // Subtle Blue Tint
+    boxShadow: "0 10px 40px rgba(59, 130, 246, 0.2)", // Glowing Shadow
+    y: -10,
+    transition: { duration: 0.3 }
+  }
+};
+
+// --- NEW: ICON SPIN EFFECT ---
+const iconSpin = {
+  rest: { rotate: 0 },
+  hover: { rotate: 360, scale: 1.2, color: "#60a5fa", transition: { duration: 0.5 } }
+};
+
 export default function LandingPage() {
   
   // --- FONT EFFECT ---
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
-  
+  const [glitchActive, setGlitchActive] = useState(false); // Track glitch state
+
   // --- SPOTLIGHT STATE ---
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // 1. Font Interval
     const fonts = [
       inputSerifLike.style.fontFamily,
       minettoLike.style.fontFamily,
@@ -61,9 +80,14 @@ export default function LandingPage() {
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
+      
+      // Trigger Glitch Shake
+      setGlitchActive(true);
+      setTimeout(() => setGlitchActive(false), 100); // Shake for 100ms
+
     }, 400);
 
-    // 2. Mouse Tracking
+    // Mouse Tracking
     const updateMousePosition = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -79,10 +103,9 @@ export default function LandingPage() {
     <div style={styles.container} className={outfit.className}>
       
       {/* --- BACKGROUND LAYERS --- */}
-      {/* 1. Base Grid (Dim) */}
       <div style={styles.gridBackground}></div>
       
-      {/* 2. SPOTLIGHT LAYER (Bright Grid where mouse is) */}
+      {/* SPOTLIGHT LAYER */}
       <div 
         style={{
           ...styles.spotlightLayer,
@@ -99,13 +122,17 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
+        {/* GLITCH TITLE ANIMATION */}
+        <motion.h1 
+          style={{...styles.glitchTitle, fontFamily: currentFont}}
+          animate={glitchActive ? { x: [-2, 2, -2, 0], opacity: 0.8 } : { x: 0, opacity: 1 }}
+        >
           PDFly
-        </h1>
+        </motion.h1>
       </motion.section>
 
 
-      {/* --- SECTION 2: HOW IT WORKS --- */}
+      {/* --- SECTION 2: HOW IT WORKS (HOLOGRAPHIC CARDS) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -123,22 +150,58 @@ export default function LandingPage() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <motion.div style={styles.stepCard} variants={revealVariants}>
-              <div style={styles.stepIcon}><Upload size={24} color="#fff"/></div>
-              <h3 style={styles.stepTitle}>1. Upload</h3>
-              <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
+            {/* CARD 1 */}
+            <motion.div 
+              style={styles.stepCard} 
+              variants={revealVariants}
+              initial="rest" whileHover="hover" animate="rest"
+            >
+              <motion.div 
+                style={styles.cardContent} 
+                variants={cardHover} // Apply Holographic styles on hover
+              >
+                <motion.div style={styles.stepIcon} variants={iconSpin}>
+                  <Upload size={24} />
+                </motion.div>
+                <h3 style={styles.stepTitle}>1. Upload</h3>
+                <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
+              </motion.div>
             </motion.div>
 
-            <motion.div style={styles.stepCard} variants={revealVariants}>
-              <div style={styles.stepIcon}><Zap size={24} color="#fff"/></div>
-              <h3 style={styles.stepTitle}>2. Analyze</h3>
-              <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
+            {/* CARD 2 */}
+            <motion.div 
+              style={styles.stepCard} 
+              variants={revealVariants}
+              initial="rest" whileHover="hover" animate="rest"
+            >
+              <motion.div 
+                style={styles.cardContent} 
+                variants={cardHover}
+              >
+                <motion.div style={styles.stepIcon} variants={iconSpin}>
+                  <Zap size={24} />
+                </motion.div>
+                <h3 style={styles.stepTitle}>2. Analyze</h3>
+                <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
+              </motion.div>
             </motion.div>
 
-            <motion.div style={styles.stepCard} variants={revealVariants}>
-              <div style={styles.stepIcon}><FileText size={24} color="#fff"/></div>
-              <h3 style={styles.stepTitle}>3. Insight</h3>
-              <p style={styles.stepDesc}>Get structured summaries and executive briefs.</p>
+            {/* CARD 3 */}
+            <motion.div 
+              style={styles.stepCard} 
+              variants={revealVariants}
+              initial="rest" whileHover="hover" animate="rest"
+            >
+              <motion.div 
+                style={styles.cardContent} 
+                variants={cardHover}
+              >
+                <motion.div style={styles.stepIcon} variants={iconSpin}>
+                  <FileText size={24} />
+                </motion.div>
+                <h3 style={styles.stepTitle}>3. Insight</h3>
+                <p style={styles.stepDesc}>Get structured summaries and executive briefs.</p>
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>
@@ -176,7 +239,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 4: CTA --- */}
+      {/* --- SECTION 4: CTA (PLASMA BUTTON) --- */}
       <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
@@ -193,11 +256,11 @@ export default function LandingPage() {
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
             <motion.button 
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(255,255,255,0.5)" }}
               whileTap={{ scale: 0.95 }}
               style={styles.finalButton}
             >
-              <div style={styles.shimmer}></div> {/* THE SHIMMER EFFECT */}
+              <div style={styles.shimmer}></div>
               <span style={{zIndex: 2, display: 'flex', alignItems: 'center', gap: '10px'}}>
                 Launch PDFly <ArrowRight size={20} />
               </span>
@@ -248,32 +311,20 @@ const styles = {
     overflow: 'hidden',
   },
 
-  // --- 1. DARK GRID (Background) ---
+  // --- GRID LAYERS ---
   gridBackground: {
-    position: 'fixed',
-    top: 0, left: 0, width: '100vw', height: '100vh',
-    zIndex: 0,
-    backgroundImage: `
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-    `,
+    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0,
+    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)`,
     backgroundSize: '40px 40px',
     animation: 'gridMove 20s linear infinite',
     opacity: 0.3,
   },
-
-  // --- 2. SPOTLIGHT GRID (Bright Overlay) ---
   spotlightLayer: {
-    position: 'fixed',
-    top: 0, left: 0, width: '100vw', height: '100vh',
-    zIndex: 0, // Same level as background, but masked
-    backgroundImage: `
-      linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)
-    `,
+    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0,
+    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)`,
     backgroundSize: '40px 40px',
     animation: 'gridMove 20s linear infinite',
-    pointerEvents: 'none', // Allow clicking through it
+    pointerEvents: 'none',
   },
 
   sectionBlock: {
@@ -294,15 +345,28 @@ const styles = {
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
 
-  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 0 },
   
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
   
-  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', transition: 'transform 0.3s' },
-  stepIcon: { marginBottom: '20px', opacity: 1 },
+  // STEP CARDS
+  stepCard: { position: 'relative' }, // Container for motion
+  cardContent: { 
+    padding: '40px', 
+    borderRadius: '20px', 
+    border: '1px solid rgba(255,255,255,0.05)', 
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    cursor: 'default',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start'
+  },
+  
+  stepIcon: { marginBottom: '20px', color: '#fff' },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem' },
 
@@ -318,7 +382,6 @@ const styles = {
 
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
   
-  // --- THE NEW BUTTON WITH SHIMMER ---
   finalButton: { 
     padding: '25px 60px', 
     fontSize: '1.5rem', 
@@ -332,15 +395,11 @@ const styles = {
     gap: '15px', 
     fontWeight: 'bold', 
     textDecoration: 'none',
-    position: 'relative', // Needed for shimmer
-    overflow: 'hidden'    // Contain the shimmer
+    position: 'relative', 
+    overflow: 'hidden'
   },
-  
-  // The Beam of Light
   shimmer: {
-    position: 'absolute',
-    top: 0, left: 0,
-    width: '100%', height: '100%',
+    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
     background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
     animation: 'shimmerMove 3s infinite',
   }
