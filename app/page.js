@@ -28,28 +28,20 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.3, // Delay between each card appearing
+      staggerChildren: 0.3, 
       delayChildren: 0.2,
     }
   }
 };
 
 const cardVariants = {
-  hidden: { 
-    opacity: 0, 
-    y: 50,              // Start slightly lower
-    filter: 'blur(10px)', // Start blurry (The Apple Touch)
-    scale: 0.95         // Start slightly smaller
-  },
+  hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)', // Become clear
+    filter: 'blur(0px)',
     scale: 1,
-    transition: { 
-      duration: 0.8, 
-      ease: [0.22, 1, 0.36, 1] // Custom "Apple-like" easing curve
-    }
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
   }
 };
 
@@ -84,10 +76,12 @@ export default function LandingPage() {
       <section style={styles.heroSection}>
         <div style={styles.glowBg}></div>
         
+        {/* ANIMATION: Fades in from Top */}
         <motion.div
           initial={{ opacity: 0, y: -100 }} 
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
+          style={styles.heroBorder} // <--- THE NEW BORDER STYLE
         >
           <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
             PDFly
@@ -96,7 +90,7 @@ export default function LandingPage() {
       </section>
 
 
-      {/* --- HOW IT WORKS (Apple Style Animation) --- */}
+      {/* --- HOW IT WORKS --- */}
       <section style={styles.section}>
         <div style={styles.contentWrapper}>
           <motion.h2 
@@ -114,23 +108,20 @@ export default function LandingPage() {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }} // Triggers when 30% visible
+            viewport={{ once: true, amount: 0.3 }}
           >
-            {/* Step 1 */}
             <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><Upload size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>1. Upload</h3>
               <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
             </motion.div>
 
-            {/* Step 2 */}
             <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><Zap size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>2. Analyze</h3>
               <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
             </motion.div>
 
-            {/* Step 3 */}
             <motion.div style={styles.stepCard} variants={cardVariants}>
               <div style={styles.stepIcon}><FileText size={24} color="#fff"/></div>
               <h3 style={styles.stepTitle}>3. Insight</h3>
@@ -219,8 +210,19 @@ const styles = {
   // HERO
   heroSection: { height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' },
   
-  // Glitch Title Style
-  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center' },
+  // NEW HERO BORDER STYLE
+  heroBorder: {
+    border: '1px solid rgba(255, 255, 255, 0.2)', // Thin semi-transparent white
+    borderRadius: '20px',                          // Rounded edges
+    padding: '30px 80px',                          // Breathing room around text
+    backgroundColor: 'rgba(255, 255, 255, 0.01)', // Extremely subtle fill
+    backdropFilter: 'blur(4px)',                   // Slight glass blur
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
   
   glowBg: { position: 'absolute', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 70%)', zIndex: -1 },
 
