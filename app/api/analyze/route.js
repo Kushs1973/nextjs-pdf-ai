@@ -37,15 +37,9 @@ export async function POST(req) {
         // --- PDF HANDLING (Text) ---
         const pdfParser = new PDFParser(this, 1);
         
-        // --- THE FIX IS HERE ---
         const parsedText = await new Promise((resolve, reject) => {
             pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
-            
-            // OLD (Broken): resolve(pdfData.getRawTextContent())
-            // NEW (Fixed):  resolve(pdfParser.getRawTextContent()) 
-            // We ask the PARSER tool to give us the text, not the data object.
             pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
-            
             pdfParser.parseBuffer(buffer);
         });
 
@@ -53,7 +47,6 @@ export async function POST(req) {
         try { cleanText = decodeURIComponent(parsedText); } 
         catch (e) { cleanText = parsedText; }
 
-        // Check if PDF is empty (scanned)
         if (!cleanText || cleanText.trim().length < 20) {
              return NextResponse.json({ 
                 result: `
@@ -68,13 +61,13 @@ export async function POST(req) {
         - Executive Summary
         - Key Points
         - Actionable Insights
-        TEXT: ${cleanText.slice(0, 20000)}
+        TEXT: ${cleanText.slice(0, 25000)} 
         `;
     }
 
-    // 3. Send to OpenAI
+    // 3. Send to OpenAI (THE GPT-5 UPGRADE)
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5-mini", // <--- THE NEWEST ENGINE
       messages: [
         { role: "system", "content": "You are a helpful analyst. Output results in HTML." },
         { role: "user", "content": promptContent },
