@@ -75,6 +75,7 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
+        {/* GLITCH TITLE: Removed Glow, Added slight letter spacing for clarity */}
         <h1 style={{...styles.glitchTitle, fontFamily: currentFont}}>
           PDFly
         </h1>
@@ -184,14 +185,11 @@ export default function LandingPage() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        
-        /* THE MOVING GRID ANIMATION */
         @keyframes gridMove {
           0% { background-position: 0 0; }
           100% { background-position: 40px 40px; }
         }
-
-        body { margin: 0; background-color: #000; }
+        body { margin: 0; background-color: #121212; } /* Lighter Dark Grey */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
     </div>
@@ -209,7 +207,7 @@ const reviews = [
 // STYLES
 const styles = {
   container: {
-    backgroundColor: '#000000',
+    backgroundColor: '#121212', // CHANGED: From #000 to #121212 (Softer)
     color: '#ffffff',
     minHeight: '100vh',
     padding: '40px 20px', 
@@ -220,29 +218,30 @@ const styles = {
     overflow: 'hidden',
   },
 
-  // --- THE NEW CYBER GRID BACKGROUND ---
+  // --- LIGHTER GRID BACKGROUND ---
   gridBackground: {
-    position: 'fixed', // Fixed so it stays while you scroll
+    position: 'fixed',
     top: 0, left: 0, width: '100vw', height: '100vh',
     zIndex: 0,
-    // This creates a subtle grid pattern
+    // Brighter grid lines (0.05 -> 0.08)
     backgroundImage: `
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
     `,
-    backgroundSize: '40px 40px', // Size of grid squares
-    animation: 'gridMove 20s linear infinite', // Makes it move slowly
-    opacity: 0.4,
+    backgroundSize: '40px 40px',
+    animation: 'gridMove 20s linear infinite',
+    opacity: 0.5, // Increased opacity slightly
   },
 
-  // --- TRANSPARENT GLASS STYLE ---
+  // --- BRIGHTER GLASS CARDS ---
   sectionBlock: {
-    zIndex: 1, // Sits on top of the grid
-    backgroundColor: 'rgba(255, 255, 255, 0.03)', // VERY Transparent
-    backdropFilter: 'blur(20px)',                 // The "Frosted" effect
-    WebkitBackdropFilter: 'blur(20px)',           // Safari support
+    zIndex: 1,
+    // Increased whiteness: 0.03 -> 0.07 for a "lighter" feel
+    backgroundColor: 'rgba(255, 255, 255, 0.07)', 
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px',
-    border: '1px solid rgba(255, 255, 255, 0.08)', // Subtle white border
+    border: '1px solid rgba(255, 255, 255, 0.1)', // Brighter border
     minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
@@ -251,40 +250,35 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',     // Shadow for depth
+    boxShadow: '0 20px 50px rgba(0,0,0,0.3)', // Softer shadow
   },
 
-  // HERO STYLES
-  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '5px', color: '#fff', textShadow: '0 0 50px rgba(255,255,255,0.2)', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
+  // HERO STYLES (NO GLOW)
+  // Removed textShadow entirely for a crisp look
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', transition: 'font-family 0.2s ease', textAlign: 'center', margin: 0 },
   
   // COMMON SECTION STYLES
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
-  // GRID
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
   
-  // Steps also get glass effect
-  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)', transition: 'transform 0.3s' },
-  
-  stepIcon: { marginBottom: '20px', opacity: 0.9 },
+  // Cards are lighter now too
+  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', transition: 'transform 0.3s' },
+  stepIcon: { marginBottom: '20px', opacity: 1 }, // Full opacity icon
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
-  stepDesc: { color: '#ccc', lineHeight: '1.6', fontSize: '1.1rem' },
+  stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem' }, // Brighter text
 
-  // SLIDER
   sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
   
-  // Reviews also get glass effect
-  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
-  
+  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
   reviewHeader: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' },
-  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#444', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
   stars: { display: 'flex', gap: '2px', marginTop: '2px' },
-  reviewText: { color: '#ddd', fontStyle: 'italic', fontSize: '15px' },
+  reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' }, // Brighter text
 
-  // CTA
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
   finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' },
 };
