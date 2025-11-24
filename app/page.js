@@ -43,7 +43,7 @@ const staggerContainer = {
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
-    scale: 1.03, // Reduced scale slightly to prevent layout shift
+    scale: 1.03, 
     borderColor: "rgba(255, 255, 255, 0.8)", 
     backgroundColor: "rgba(255, 255, 255, 0.1)", 
     boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", 
@@ -105,8 +105,9 @@ export default function LandingPage() {
       ></div>
 
       {/* --- SECTION 1: HERO --- */}
+      {/* This one needs to be centered, so we keep justifyContent: center here manually */}
       <motion.section 
-        style={styles.sectionBlock}
+        style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.5 }}
@@ -138,7 +139,6 @@ export default function LandingPage() {
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
-          {/* FLEX GRID - Forces Perfect Centering */}
           <motion.div 
             style={styles.flexGrid} 
             variants={staggerContainer}
@@ -191,7 +191,7 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.3 }}
         variants={revealVariants}
       >
-        <h2 style={{...styles.sectionHeader, marginBottom: '60px'}}>Trusted by Analysts</h2>
+        <h2 style={styles.sectionHeader}>Trusted by Analysts</h2>
         
         <div style={styles.sliderContainer}>
           <div style={styles.sliderTrack}>
@@ -309,40 +309,44 @@ const styles = {
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // FIXED: Pushes content to TOP
     alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+    paddingTop: '100px', // FIXED: Adds space at top for Header
   },
 
-  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 0 },
+  glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' }, // Center logo vertically
   
-  // Added Centering to Wrapper
+  // WRAPPER that takes full height to space out children
   contentWrapper: { 
     maxWidth: '1200px', 
     margin: '0 auto', 
     width: '100%',
+    height: '100%', // Take full height of section
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'flex-start', // Start from top
     alignItems: 'center'
   },
   
-  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
+  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '0px', fontWeight: 'bold', color: '#fff' },
 
-  // --- FLEX GRID (FIXED) ---
+  // GRID FIXED
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
     justifyContent: 'center', 
     gap: '30px', 
-    width: '100%' 
+    width: '100%',
+    marginTop: 'auto', // FIXED: Pushes Grid to vertical center/bottom
+    marginBottom: 'auto',
   },
   
-  // --- STEP CARD CONTAINER (FLEXIBLE) ---
   stepCardContainer: { 
     position: 'relative',
-    flex: '1 1 300px',  // Grow, Shrink, Start at 300px
-    maxWidth: '380px',  // Don't get too fat
-    minWidth: '280px',  // Don't get too skinny
+    flex: '1 1 300px',  
+    maxWidth: '380px',  
+    minWidth: '280px',
   },
   
   cardContent: { 
@@ -361,37 +365,8 @@ const styles = {
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem', textAlign: 'left' },
 
-  sliderContainer: { width: '100%', overflow: 'hidden' },
+  // Slider: Pushes to center of its section
+  sliderContainer: { width: '100%', overflow: 'hidden', marginTop: 'auto', marginBottom: 'auto' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
   
-  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
-  reviewHeader: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' },
-  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  reviewName: { fontSize: '14px', fontWeight: 'bold', color: '#fff' },
-  stars: { display: 'flex', gap: '2px', marginTop: '2px' },
-  reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' },
-
-  ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
-  
-  finalButton: { 
-    padding: '25px 60px', 
-    fontSize: '1.5rem', 
-    backgroundColor: '#fff', 
-    color: '#000', 
-    border: 'none', 
-    borderRadius: '100px', 
-    cursor: 'pointer', 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: '15px', 
-    fontWeight: 'bold', 
-    textDecoration: 'none',
-    position: 'relative', 
-    overflow: 'hidden'
-  },
-  shimmer: {
-    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-    background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
-    animation: 'shimmerMove 3s infinite',
-  }
-};
+  reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(
