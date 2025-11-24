@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import PDFParser from 'pdf2json'; // Using the stable tool
+import PDFParser from 'pdf2json';
 
 export async function POST(req) {
   try {
@@ -30,9 +30,14 @@ export async function POST(req) {
     } else {
         // --- PDF PATH (Text AI) ---
         const pdfParser = new PDFParser(this, 1);
+        
         const parsedText = await new Promise((resolve, reject) => {
             pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
-            pdfParser.on("pdfParser_dataReady", (pdfData) => resolve(pdfData.getRawTextContent()));
+            
+            // --- THE FIX IS HERE ---
+            // We ask the PARSER to get the text, not the data object.
+            pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
+            
             pdfParser.parseBuffer(buffer);
         });
 
@@ -42,7 +47,7 @@ export async function POST(req) {
         catch (e) { cleanText = parsedText; }
 
         // --- THE SMART CHECK ---
-        // We count only real letters/numbers. If less than 50, it's likely a scan.
+        // Count real letters/numbers. If less than 50, it's a scan.
         const alphanumericCount = (cleanText.match(/[a-zA-Z0-9]/g) || []).length;
 
         if (alphanumericCount < 50) {
@@ -50,13 +55,13 @@ export async function POST(req) {
                 result: `
                 <h3>⚠️ Image-PDF Detected</h3>
                 <p><b>We found 0 readable text in this PDF.</b></p>
-                <p>It looks like this document is a scanned photo (like an ID card or receipt) saved as a PDF.</p>
+                <p>It looks like this document is a scanned photo saved as a PDF.</p>
                 <br/>
                 <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; border: 1px solid #444;">
                   <p style="margin:0; font-weight:bold; color: #fff;">✅ How to fix:</p>
                   <ul style="margin-top:10px; margin-bottom:0; color: #ccc;">
                     <li>Take a <b>Screenshot</b> of this PDF.</li>
-                    <li>Upload the screenshot (<b>.JPG</b> or <b>.PNG</b>) directly.</li>
+                    <li>Upload the screenshot (<b>.JPG</b> or <b>.PNG</b>).</li>
                   </ul>
                 </div>
                 ` 
