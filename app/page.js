@@ -189,4 +189,5 @@ const styles = {
   // CTA
   ctaSection: { height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' },
   ctaHeadline: { fontSize: '3rem', marginBottom: '40px' },
-  finalButton: { padding: '20px 50px', fontSize: '1.2rem', backgroundColor: '#000', color: '#fff', border
+  finalButton: { padding: '20px 50px', fontSize: '1.2rem', backgroundColor: '#000', color: '#fff', border: '1px solid #fff', borderRadius: '50px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px' },
+};
