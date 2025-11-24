@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // We removed the external packages rule so Vercel will now bundle the tool correctly.
+  serverExternalPackages: ['pdf-parse'],
   eslint: {
     ignoreDuringBuilds: true,
   },
