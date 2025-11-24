@@ -1,39 +1,34 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// FIX: We use 'require' here because 'pdf-parse' is an older library
-// that doesn't support the 'import' statement perfectly in this environment.
+// 1. FIX: Manually create a 'require' tool for the old-school library
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const pdf = require('pdf-parse');
 
 export async function POST(req) {
   try {
-    // 1. Prepare the incoming file
     const formData = await req.formData();
     const file = formData.get('file');
     const apiKey = formData.get('apiKey');
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-    }
+    if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
 
-    // 2. Read the PDF text
+    // 2. Read the PDF
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
-    // Use the library to extract text
     const pdfData = await pdf(buffer);
-    const pdfText = pdfData.text.slice(0, 15000); // Limit text to save costs
+    const pdfText = pdfData.text.slice(0, 15000);
 
-    // 3. Send to OpenAI
+    // 3. AI Analysis
     const client = new OpenAI({ apiKey: apiKey });
-    
+
     const prompt = `
-    Analyze this text from a PDF. Provide a response in HTML format (using <h3>, <ul>, <li>, <p> tags only) suitable for a dark theme website.
-    Structure:
+    Analyze this PDF text. Output strictly in HTML (using <h3>, <ul>, <li>, <p>).
     - Executive Summary
-    - Key Points (bullet points)
+    - Key Points
     - Actionable Insights
-    
+
     TEXT: ${pdfText}
     `;
 
@@ -45,11 +40,10 @@ export async function POST(req) {
       ],
     });
 
-    // 4. Return the answer
     return NextResponse.json({ result: completion.choices[0].message.content });
 
   } catch (error) {
-    console.error("Error processing PDF:", error);
+    console.error("Analysis Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
