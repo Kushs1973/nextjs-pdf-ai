@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-// Added useMotionValue and useTransform for 3D math
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
 import { 
@@ -19,9 +18,9 @@ const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
 // --- ANIMATION VARIANTS ---
 const revealVariants = {
-  hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
-    opacity: 1, y: 0, filter: 'blur(0px)', 
+    opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, 
     transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
   }
 };
@@ -34,7 +33,6 @@ const staggerContainer = {
   }
 };
 
-// --- HOLOGRAPHIC CARD HOVER ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
@@ -52,56 +50,52 @@ const iconSpin = {
   hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
 
-// --- NEW COMPONENT: 3D TILT SECTION ---
-// This handles the math to tilt the card based on mouse position
+// --- FIXED 3D TILT COMPONENT ---
 const TiltSection = ({ children, style }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // How much rotation (in degrees) based on mouse distance from center
-  const rotateX = useTransform(y, [-300, 300], [5, -5]); 
-  const rotateY = useTransform(x, [-300, 300], [-5, 5]);
+  // REDUCED TILT: Changed from 5 to 1.5 degrees for subtlety
+  const rotateX = useTransform(y, [-300, 300], [1.5, -1.5]); 
+  const rotateY = useTransform(x, [-300, 300], [-1.5, 1.5]);
 
   function handleMouseMove(event) {
     const rect = event.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    // Calculate distance from center
     x.set(event.clientX - centerX);
     y.set(event.clientY - centerY);
   }
 
   function handleMouseLeave() {
-    // Reset to flat when mouse leaves
     x.set(0);
     y.set(0);
   }
 
   return (
-    // Outer Motion Div handles entrance animation (revealVariants)
     <motion.div
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
       variants={revealVariants}
-      style={{ perspective: 1000, zIndex: 1 }} // Perspective is key for 3D
+      style={{ 
+        perspective: 1000, 
+        width: '100%', // FIXED: Ensures it takes full width
+        display: 'flex', 
+        justifyContent: 'center' 
+      }}
     >
-      {/* Inner Motion Div handles the 3D Tilt on hover */}
       <motion.div
         style={{
           ...style,
-          rotateX, // Apply calculated rotation
+          rotateX, 
           rotateY,
-          transformStyle: "preserve-3d", // Ensures children also look 3D
+          transformStyle: "preserve-3d",
+          width: '100%', // FIXED: Ensures inner card takes full width of parent
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        // Add realistic 3D lighting shadows/borders
-        whileHover={{ 
-          boxShadow: "0 30px 60px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.2), inset 0 -2px 2px rgba(0,0,0,0.3)",
-          border: "1px solid rgba(255, 255, 255, 0.15)"
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        transition={{ type: "spring", stiffness: 200, damping: 20 }} // Smoother spring
       >
         {children}
       </motion.div>
@@ -156,7 +150,7 @@ export default function LandingPage() {
         }}
       ></div>
 
-      {/* --- SECTION 1: HERO (Now using TiltSection) --- */}
+      {/* --- SECTION 1: HERO --- */}
       <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
@@ -172,7 +166,7 @@ export default function LandingPage() {
       </TiltSection>
 
 
-      {/* --- SECTION 2: HOW IT WORKS (Now using TiltSection) --- */}
+      {/* --- SECTION 2: HOW IT WORKS --- */}
       <TiltSection style={styles.sectionBlock}>
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
@@ -221,7 +215,7 @@ export default function LandingPage() {
       </TiltSection>
 
 
-      {/* --- SECTION 3: SOCIAL PROOF (Now using TiltSection) --- */}
+      {/* --- SECTION 3: SOCIAL PROOF --- */}
       <TiltSection style={styles.sectionBlock}>
         <h2 style={styles.sectionHeader}>Trusted by Analysts</h2>
         
@@ -246,7 +240,7 @@ export default function LandingPage() {
       </TiltSection>
 
 
-      {/* --- SECTION 4: CTA (Now using TiltSection) --- */}
+      {/* --- SECTION 4: CTA --- */}
       <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
@@ -322,15 +316,13 @@ const styles = {
     pointerEvents: 'none',
   },
 
-  // Note: sectionBlock styles are now applied to the inner motion div in TiltSection
+  // Note: sectionBlock styles applied to inner motion div
   sectionBlock: {
     backgroundColor: 'rgba(255, 255, 255, 0.07)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px',
-    // Initial border and shadow (before hover)
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
     minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
@@ -339,7 +331,7 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'flex-start', 
     alignItems: 'center',
-    width: '100%', // Ensure it takes full width
+    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
 
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' },
