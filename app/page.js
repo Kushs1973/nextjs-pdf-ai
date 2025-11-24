@@ -1,16 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+// Added useMotionValue and useTransform for 3D math
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
 import { 
-  Outfit, 
-  Roboto_Slab, 
-  Oswald, 
-  Zilla_Slab, 
-  DM_Sans, 
-  Fredoka, 
-  Montserrat 
+  Outfit, Roboto_Slab, Oswald, Zilla_Slab, DM_Sans, Fredoka, Montserrat 
 } from 'next/font/google';
 
 // 1. LOAD FONTS
@@ -24,9 +19,9 @@ const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
 // --- ANIMATION VARIANTS ---
 const revealVariants = {
-  hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
+  hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
   visible: { 
-    opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, 
+    opacity: 1, y: 0, filter: 'blur(0px)', 
     transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
   }
 };
@@ -39,14 +34,14 @@ const staggerContainer = {
   }
 };
 
-// --- WHITE HOLOGRAPHIC HOVER (The Cool Effect) ---
+// --- HOLOGRAPHIC CARD HOVER ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
     scale: 1.03, 
-    borderColor: "rgba(255, 255, 255, 0.8)", // Bright White Border
-    backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle White Tint
-    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", // White Glow
+    borderColor: "rgba(255, 255, 255, 0.8)", 
+    backgroundColor: "rgba(255, 255, 255, 0.1)", 
+    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", 
     y: -5,
     transition: { duration: 0.3 }
   }
@@ -56,6 +51,64 @@ const iconSpin = {
   rest: { rotate: 0, color: "#fff" },
   hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
+
+// --- NEW COMPONENT: 3D TILT SECTION ---
+// This handles the math to tilt the card based on mouse position
+const TiltSection = ({ children, style }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // How much rotation (in degrees) based on mouse distance from center
+  const rotateX = useTransform(y, [-300, 300], [5, -5]); 
+  const rotateY = useTransform(x, [-300, 300], [-5, 5]);
+
+  function handleMouseMove(event) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    // Calculate distance from center
+    x.set(event.clientX - centerX);
+    y.set(event.clientY - centerY);
+  }
+
+  function handleMouseLeave() {
+    // Reset to flat when mouse leaves
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    // Outer Motion Div handles entrance animation (revealVariants)
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={revealVariants}
+      style={{ perspective: 1000, zIndex: 1 }} // Perspective is key for 3D
+    >
+      {/* Inner Motion Div handles the 3D Tilt on hover */}
+      <motion.div
+        style={{
+          ...style,
+          rotateX, // Apply calculated rotation
+          rotateY,
+          transformStyle: "preserve-3d", // Ensures children also look 3D
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        // Add realistic 3D lighting shadows/borders
+        whileHover={{ 
+          boxShadow: "0 30px 60px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.2), inset 0 -2px 2px rgba(0,0,0,0.3)",
+          border: "1px solid rgba(255, 255, 255, 0.15)"
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+};
+
 
 export default function LandingPage() {
   
@@ -76,11 +129,8 @@ export default function LandingPage() {
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
-      
-      // Trigger Glitch
       setGlitchActive(true);
       setTimeout(() => setGlitchActive(false), 150); 
-
     }, 400);
 
     const updateMousePosition = (e) => {
@@ -97,7 +147,6 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* BACKGROUND LAYERS */}
       <div style={styles.gridBackground}></div>
       <div 
         style={{
@@ -107,37 +156,24 @@ export default function LandingPage() {
         }}
       ></div>
 
-      {/* --- SECTION 1: HERO --- */}
-      <motion.section 
-        style={{...styles.sectionBlock, justifyContent: 'center'}}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-        variants={revealVariants}
-      >
+      {/* --- SECTION 1: HERO (Now using TiltSection) --- */}
+      <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
           animate={glitchActive ? { 
             x: [-5, 5, -5, 0], 
             skewX: [-10, 10, -5, 0], 
-            opacity: [1, 0.8, 1],
-            scale: [1, 1.02, 1]
+            opacity: [1, 0.8, 1], scale: [1, 1.02, 1]
           } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 0.15 }}
         >
           PDFly
         </motion.h1>
-      </motion.section>
+      </TiltSection>
 
 
-      {/* --- SECTION 2: HOW IT WORKS --- */}
-      <motion.section 
-        style={styles.sectionBlock}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={revealVariants}
-      >
+      {/* --- SECTION 2: HOW IT WORKS (Now using TiltSection) --- */}
+      <TiltSection style={styles.sectionBlock}>
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
@@ -182,17 +218,11 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
         </div>
-      </motion.section>
+      </TiltSection>
 
 
-      {/* --- SECTION 3: SOCIAL PROOF --- */}
-      <motion.section 
-        style={styles.sectionBlock}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={revealVariants}
-      >
+      {/* --- SECTION 3: SOCIAL PROOF (Now using TiltSection) --- */}
+      <TiltSection style={styles.sectionBlock}>
         <h2 style={styles.sectionHeader}>Trusted by Analysts</h2>
         
         <div style={styles.sliderContainer}>
@@ -213,17 +243,11 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </motion.section>
+      </TiltSection>
 
 
-      {/* --- SECTION 4: CTA --- */}
-      <motion.section 
-        style={{...styles.sectionBlock, justifyContent: 'center'}}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-        variants={revealVariants}
-      >
+      {/* --- SECTION 4: CTA (Now using TiltSection) --- */}
+      <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
@@ -239,7 +263,7 @@ export default function LandingPage() {
             </motion.button>
           </Link>
         </div>
-      </motion.section>
+      </TiltSection>
 
       <style jsx global>{`
         @keyframes scroll {
@@ -298,22 +322,24 @@ const styles = {
     pointerEvents: 'none',
   },
 
+  // Note: sectionBlock styles are now applied to the inner motion div in TiltSection
   sectionBlock: {
-    zIndex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.07)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderRadius: '40px',
+    // Initial border and shadow (before hover)
     border: '1px solid rgba(255, 255, 255, 0.1)',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
     minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start', // FIXED: Top alignment
+    justifyContent: 'flex-start', 
     alignItems: 'center',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+    width: '100%', // Ensure it takes full width
   },
 
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' },
@@ -331,7 +357,6 @@ const styles = {
   
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '20px', marginTop: '20px', fontWeight: 'bold', color: '#fff' },
 
-  // FLEX GRID
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
