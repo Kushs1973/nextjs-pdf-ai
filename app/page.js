@@ -22,7 +22,7 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- APPLE REVEAL ANIMATION ---
+// --- REVEAL ANIMATION ---
 const revealVariants = {
   hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
@@ -67,7 +67,7 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- SECTION 1: HERO (Full Screen Card) --- */}
+      {/* --- SECTION 1: HERO (PDFly) --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -82,7 +82,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 2: HOW IT WORKS (Full Screen Card) --- */}
+      {/* --- SECTION 2: HOW IT WORKS --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -122,7 +122,7 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 3: SOCIAL PROOF (Full Screen Card) --- */}
+      {/* --- SECTION 3: SOCIAL PROOF --- */}
       <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
@@ -153,9 +153,9 @@ export default function LandingPage() {
       </motion.section>
 
 
-      {/* --- SECTION 4: CTA (Full Screen Card, Perfectly Centered) --- */}
+      {/* --- SECTION 4: CTA --- */}
       <motion.section 
-        style={{...styles.sectionBlock, justifyContent: 'center'}} // Forces vertical centering
+        style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.5 }}
@@ -164,11 +164,12 @@ export default function LandingPage() {
         <div style={{
           display: 'flex', 
           flexDirection: 'column', 
-          alignItems: 'center', // Forces horizontal centering
+          alignItems: 'center', 
           textAlign: 'center' 
         }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
-          <Link href="/analyzer">
+          {/* UPDATED LINK: No Underline */}
+          <Link href="/analyzer" style={{ textDecoration: 'none' }}>
             <motion.button 
               whileHover={{ scale: 1.05, backgroundColor: '#fff', color: '#000' }}
               whileTap={{ scale: 0.95 }}
@@ -186,7 +187,6 @@ export default function LandingPage() {
           100% { transform: translateX(-50%); }
         }
         body { margin: 0; background-color: #000; }
-        /* Hide scrollbar for cleaner look */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
     </div>
@@ -207,26 +207,26 @@ const styles = {
     backgroundColor: '#000000',
     color: '#ffffff',
     minHeight: '100vh',
-    padding: '40px 20px', // Top/Bottom padding
+    padding: '40px 20px', // Outer padding
     display: 'flex',
     flexDirection: 'column',
-    gap: '60px', // BIG GAP between the "pages"
+    gap: '60px',
   },
 
-  // --- THE SEPARATE RECTANGLES STYLE ---
+  // --- RECTANGLE STYLE ADJUSTED ---
   sectionBlock: {
-    backgroundColor: '#1F1F1F', // Lighter "Normal" Grey
-    borderRadius: '40px',       // Smoother curves
-    // Border Removed for cleaner look
-    height: '90vh',             // Takes up 90% of the screen height
+    backgroundColor: '#1F1F1F', // Normal Grey
+    borderRadius: '40px',
+    // FIXED: Changed to 80vh so it fits better on screen without cutoff
+    minHeight: '80vh',             
     padding: '40px',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',   // Vertically centers content inside
-    alignItems: 'center',       // Horizontally centers content inside
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)', // Subtle shadow
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
   },
 
   // HERO STYLES
@@ -239,7 +239,7 @@ const styles = {
 
   // GRID
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', width: '100%' },
-  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: '#2a2a2a', transition: 'transform 0.3s' }, // Slightly lighter than background
+  stepCard: { padding: '40px', borderRadius: '20px', backgroundColor: '#2a2a2a', transition: 'transform 0.3s' },
   stepIcon: { marginBottom: '20px', opacity: 0.9 },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#ccc', lineHeight: '1.6', fontSize: '1.1rem' },
@@ -256,5 +256,5 @@ const styles = {
 
   // CTA
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
-  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold' },
+  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none' }, // Added textDecoration none here too as backup
 };
