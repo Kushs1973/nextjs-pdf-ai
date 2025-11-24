@@ -1,130 +1,108 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Space_Grotesk } from 'next/font/google';
 
-export default function Home() {
-  const [apiKey, setApiKey] = useState('');
-  const [file, setFile] = useState(null);
-  const [analysis, setAnalysis] = useState('');
-  const [loading, setLoading] = useState(false);
+// Load the "Cool Font"
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['400', '700'] });
 
-  const handleAnalyze = async () => {
-    if (!apiKey || !file) {
-      alert("Please provide both an API Key and a PDF file.");
-      return;
-    }
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('apiKey', apiKey);
-
-    try {
-      // Send to our backend API
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-
-      setAnalysis(data.result);
-    } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function LandingPage() {
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>📄 AI PDF Analyst</h1>
-        <p style={styles.subtitle}>Minimalist. Structured. Intelligent.</p>
+    <div style={styles.container} className={spaceGrotesk.className}>
+      {/* Background Gradient Effect */}
+      <div style={styles.gradient}></div>
 
-        {/* API Key Input */}
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>OpenAI API Key</label>
-          <input 
-            type="password" 
-            placeholder="sk-..." 
-            style={styles.input}
-            onChange={(e) => setApiKey(e.target.value)}
-          />
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={styles.content}
+      >
+        <h1 style={styles.title}>
+          PDF <span style={{ color: '#888' }}>Analyst_AI</span>
+        </h1>
+        
+        <p style={styles.description}>
+          Turn complex documents into clear, structured insights. 
+          <br /> Powered by GPT-4o.
+        </p>
+
+        <Link href="/analyzer">
+          <motion.button 
+            whileHover={{ scale: 1.05, backgroundColor: '#ffffff', color: '#000000' }}
+            whileTap={{ scale: 0.95 }}
+            style={styles.button}
+          >
+            Launch App &rarr;
+          </motion.button>
+        </Link>
+
+        <div style={styles.footer}>
+          <p>Secure. Private. Intelligent.</p>
         </div>
-
-        {/* File Upload */}
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Upload Document</label>
-          <input 
-            type="file" 
-            accept=".pdf"
-            style={styles.fileInput}
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-        </div>
-
-        {/* Action Button */}
-        <button 
-          onClick={handleAnalyze} 
-          style={loading ? styles.buttonDisabled : styles.button}
-          disabled={loading}
-        >
-          {loading ? "Analyzing..." : "Start Analysis"}
-        </button>
-
-        {/* Results Area */}
-        {analysis && (
-          <div style={styles.resultArea}>
-            <div dangerouslySetInnerHTML={{ __html: analysis }} />
-          </div>
-        )}
-      </div>
+      </motion.div>
     </div>
   );
 }
 
-// Minimalist Dark Theme Styles
 const styles = {
   container: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0a',
+    height: '100vh',
+    width: '100vw',
+    backgroundColor: '#050505',
     color: '#ffffff',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    fontFamily: 'sans-serif',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  gradient: {
+    position: 'absolute',
+    top: '-20%',
+    left: '-20%',
+    width: '140%',
+    height: '140%',
+    background: 'radial-gradient(circle, rgba(50,50,50,0.2) 0%, rgba(0,0,0,0) 70%)',
+    zIndex: 0,
+  },
+  content: {
+    zIndex: 1,
+    textAlign: 'center',
     padding: '20px',
   },
-  card: {
-    width: '100%',
-    maxWidth: '600px',
-    backgroundColor: '#171717',
-    borderRadius: '12px',
-    padding: '30px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-    border: '1px solid #333',
+  title: {
+    fontSize: '5rem',
+    fontWeight: '700',
+    letterSpacing: '-2px',
+    marginBottom: '20px',
+    lineHeight: '1',
   },
-  title: { fontSize: '24px', marginBottom: '10px', textAlign: 'center' },
-  subtitle: { color: '#888', textAlign: 'center', marginBottom: '30px', fontSize: '14px' },
-  inputGroup: { marginBottom: '20px' },
-  label: { display: 'block', marginBottom: '8px', fontSize: '12px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px' },
-  input: {
-    width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #333',
-    backgroundColor: '#262626', color: '#fff', fontSize: '14px', outline: 'none'
+  description: {
+    fontSize: '1.2rem',
+    color: '#a1a1a1',
+    maxWidth: '500px',
+    margin: '0 auto 40px auto',
+    lineHeight: '1.6',
   },
-  fileInput: { color: '#fff', fontSize: '14px' },
   button: {
-    width: '100%', padding: '14px', borderRadius: '6px', border: 'none',
-    backgroundColor: '#fff', color: '#000', fontWeight: 'bold', cursor: 'pointer',
-    marginTop: '10px', transition: '0.2s'
+    padding: '16px 40px',
+    fontSize: '1.1rem',
+    borderRadius: '50px',
+    border: '1px solid #333',
+    backgroundColor: '#111',
+    color: '#fff',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    transition: 'background-color 0.3s',
   },
-  buttonDisabled: {
-    width: '100%', padding: '14px', borderRadius: '6px', border: 'none',
-    backgroundColor: '#444', color: '#888', cursor: 'not-allowed', marginTop: '10px'
-  },
-  resultArea: {
-    marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #333',
-    lineHeight: '1.6', color: '#ddd'
+  footer: {
+    marginTop: '60px',
+    fontSize: '0.8rem',
+    color: '#444',
+    letterSpacing: '1px',
+    textTransform: 'uppercase',
   }
 };
