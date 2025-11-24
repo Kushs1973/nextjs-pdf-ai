@@ -16,7 +16,7 @@ const sonarLike = DM_Sans({ subsets: ['latin'], weight: ['700'] });
 const mokokoLike = Fredoka({ subsets: ['latin'], weight: ['600'] });
 const avenirLike = Montserrat({ subsets: ['latin'], weight: ['800'] });
 
-// --- ANIMATION VARIANTS ---
+// --- VARIANTS ---
 const revealVariants = {
   hidden: { opacity: 0, y: 50, filter: 'blur(10px)', scale: 0.98 },
   visible: { 
@@ -50,12 +50,10 @@ const iconSpin = {
   hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
 
-// --- FIXED 3D TILT COMPONENT ---
+// --- 3D TILT COMPONENT ---
 const TiltSection = ({ children, style }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-
-  // REDUCED TILT: Changed from 5 to 1.5 degrees for subtlety
   const rotateX = useTransform(y, [-300, 300], [1.5, -1.5]); 
   const rotateY = useTransform(x, [-300, 300], [-1.5, 1.5]);
 
@@ -78,24 +76,13 @@ const TiltSection = ({ children, style }) => {
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
       variants={revealVariants}
-      style={{ 
-        perspective: 1000, 
-        width: '100%', // FIXED: Ensures it takes full width
-        display: 'flex', 
-        justifyContent: 'center' 
-      }}
+      style={{ perspective: 1000, width: '100%', display: 'flex', justifyContent: 'center' }}
     >
       <motion.div
-        style={{
-          ...style,
-          rotateX, 
-          rotateY,
-          transformStyle: "preserve-3d",
-          width: '100%', // FIXED: Ensures inner card takes full width of parent
-        }}
+        style={{ ...style, rotateX, rotateY, transformStyle: "preserve-3d", width: '100%' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }} // Smoother spring
+        transition={{ type: "spring", stiffness: 200, damping: 20 }}
       >
         {children}
       </motion.div>
@@ -103,9 +90,7 @@ const TiltSection = ({ children, style }) => {
   );
 };
 
-
 export default function LandingPage() {
-  
   const [currentFont, setCurrentFont] = useState(avenirLike.style.fontFamily);
   const [glitchActive, setGlitchActive] = useState(false); 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -150,62 +135,39 @@ export default function LandingPage() {
         }}
       ></div>
 
-      {/* --- SECTION 1: HERO --- */}
-      <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
+      {/* SECTION 1: HERO */}
+      <TiltSection style={styles.sectionBlock}>
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
-          animate={glitchActive ? { 
-            x: [-5, 5, -5, 0], 
-            skewX: [-10, 10, -5, 0], 
-            opacity: [1, 0.8, 1], scale: [1, 1.02, 1]
-          } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
+          animate={glitchActive ? { x: [-5, 5, -5, 0], skewX: [-10, 10, -5, 0], opacity: [1, 0.8, 1], scale: [1, 1.02, 1] } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 0.15 }}
         >
           PDFly
         </motion.h1>
       </TiltSection>
 
-
-      {/* --- SECTION 2: HOW IT WORKS --- */}
+      {/* SECTION 2: HOW IT WORKS */}
       <TiltSection style={styles.sectionBlock}>
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
-          
-          <motion.div 
-            style={styles.flexGrid} 
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {/* CARD 1 */}
+          <motion.div style={styles.flexGrid} variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <motion.div style={styles.stepCardContainer} variants={revealVariants}>
               <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
-                <motion.div style={styles.stepIcon} variants={iconSpin}>
-                  <Upload size={24} />
-                </motion.div>
+                <motion.div style={styles.stepIcon} variants={iconSpin}><Upload size={24} /></motion.div>
                 <h3 style={styles.stepTitle}>1. Upload</h3>
                 <p style={styles.stepDesc}>Drag & drop any PDF or Image file into the secure vault.</p>
               </motion.div>
             </motion.div>
-
-            {/* CARD 2 */}
             <motion.div style={styles.stepCardContainer} variants={revealVariants}>
               <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
-                <motion.div style={styles.stepIcon} variants={iconSpin}>
-                  <Zap size={24} />
-                </motion.div>
+                <motion.div style={styles.stepIcon} variants={iconSpin}><Zap size={24} /></motion.div>
                 <h3 style={styles.stepTitle}>2. Analyze</h3>
                 <p style={styles.stepDesc}>Our AI scans every pixel and letter instantly.</p>
               </motion.div>
             </motion.div>
-
-            {/* CARD 3 */}
             <motion.div style={styles.stepCardContainer} variants={revealVariants}>
               <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
-                <motion.div style={styles.stepIcon} variants={iconSpin}>
-                  <FileText size={24} />
-                </motion.div>
+                <motion.div style={styles.stepIcon} variants={iconSpin}><FileText size={24} /></motion.div>
                 <h3 style={styles.stepTitle}>3. Insight</h3>
                 <p style={styles.stepDesc}>Get structured summaries and executive briefs.</p>
               </motion.div>
@@ -214,34 +176,31 @@ export default function LandingPage() {
         </div>
       </TiltSection>
 
-
-      {/* --- SECTION 3: SOCIAL PROOF --- */}
+      {/* SECTION 3: SOCIAL PROOF */}
       <TiltSection style={styles.sectionBlock}>
-        <h2 style={styles.sectionHeader}>Trusted by Analysts</h2>
-        
-        <div style={styles.sliderContainer}>
-          <div style={styles.sliderTrack}>
-            {[...reviews, ...reviews, ...reviews].map((review, index) => (
-              <div key={index} style={styles.reviewCard}>
-                <div style={styles.reviewHeader}>
-                  <div style={styles.avatar}><User size={14} color="#fff"/></div>
-                  <div>
-                    <div style={styles.reviewName}>{review.name}</div>
-                    <div style={styles.stars}>
-                      {[1,2,3,4,5].map(i => <Star key={i} size={8} fill="#fff" color="none"/>)}
+        <div style={styles.contentWrapper}>
+          <h2 style={styles.sectionHeader}>Trusted by Analysts</h2>
+          <div style={styles.sliderContainer}>
+            <div style={styles.sliderTrack}>
+              {[...reviews, ...reviews, ...reviews].map((review, index) => (
+                <div key={index} style={styles.reviewCard}>
+                  <div style={styles.reviewHeader}>
+                    <div style={styles.avatar}><User size={14} color="#fff"/></div>
+                    <div>
+                      <div style={styles.reviewName}>{review.name}</div>
+                      <div style={styles.stars}>{[1,2,3,4,5].map(i => <Star key={i} size={8} fill="#fff" color="none"/>)}</div>
                     </div>
                   </div>
+                  <p style={styles.reviewText}>"{review.text}"</p>
                 </div>
-                <p style={styles.reviewText}>"{review.text}"</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </TiltSection>
 
-
-      {/* --- SECTION 4: CTA --- */}
-      <TiltSection style={{...styles.sectionBlock, justifyContent: 'center'}}>
+      {/* SECTION 4: CTA */}
+      <TiltSection style={styles.sectionBlock}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <h2 style={styles.ctaHeadline}>Ready to simplify?</h2>
           <Link href="/analyzer" style={{ textDecoration: 'none' }}>
@@ -260,18 +219,9 @@ export default function LandingPage() {
       </TiltSection>
 
       <style jsx global>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes gridMove {
-          0% { background-position: 0 0; }
-          100% { background-position: 40px 40px; }
-        }
-        @keyframes shimmerMove {
-          0% { transform: translateX(-150%); }
-          100% { transform: translateX(150%); }
-        }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+        @keyframes shimmerMove { 0% { transform: translateX(-150%); } 100% { transform: translateX(150%); } }
         body { margin: 0; background-color: #121212; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
@@ -279,7 +229,6 @@ export default function LandingPage() {
   );
 }
 
-// DATA
 const reviews = [
   { name: "Alex D.", text: "Dark mode perfection. Fast and accurate." },
   { name: "Sarah J.", text: "Finally an AI reader that handles images!" },
@@ -287,49 +236,32 @@ const reviews = [
   { name: "Priya K.", text: "Cleanest UI I have ever seen." },
 ];
 
-// STYLES
 const styles = {
   container: {
-    backgroundColor: '#121212',
-    color: '#ffffff',
-    minHeight: '100vh',
-    padding: '40px 20px', 
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '60px',
-    position: 'relative',
-    overflow: 'hidden',
+    backgroundColor: '#121212', color: '#ffffff', minHeight: '100vh',
+    padding: '40px 20px', display: 'flex', flexDirection: 'column', gap: '60px',
+    position: 'relative', overflow: 'hidden',
   },
-
   gridBackground: {
     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0,
     backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)`,
-    backgroundSize: '40px 40px',
-    animation: 'gridMove 20s linear infinite',
-    opacity: 0.3,
+    backgroundSize: '40px 40px', animation: 'gridMove 20s linear infinite', opacity: 0.3,
   },
   spotlightLayer: {
     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0,
     backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px)`,
-    backgroundSize: '40px 40px',
-    animation: 'gridMove 20s linear infinite',
-    pointerEvents: 'none',
+    backgroundSize: '40px 40px', animation: 'gridMove 20s linear infinite', pointerEvents: 'none',
   },
-
-  // Note: sectionBlock styles applied to inner motion div
+  
+  // --- THE FIX: CENTERED LAYOUT ---
   sectionBlock: {
-    backgroundColor: 'rgba(255, 255, 255, 0.07)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    borderRadius: '40px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    minHeight: '80vh',             
-    padding: '40px',
-    position: 'relative',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start', 
+    zIndex: 1, backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    borderRadius: '40px', border: '1px solid rgba(255, 255, 255, 0.1)',
+    minHeight: '80vh', padding: '40px',
+    position: 'relative', overflow: 'hidden',
+    display: 'flex', flexDirection: 'column',
+    justifyContent: 'center', // FIXED: CENTERS VERTICALLY
     alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
@@ -337,52 +269,30 @@ const styles = {
   glitchTitle: { fontSize: 'clamp(3rem, 10vw, 8rem)', fontWeight: '900', letterSpacing: '2px', color: '#fff', textAlign: 'center', margin: 'auto' },
   
   contentWrapper: { 
-    maxWidth: '1200px', 
-    margin: '0 auto', 
-    width: '100%',
-    height: '100%', 
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start', 
-    alignItems: 'center'
+    maxWidth: '1200px', margin: '0 auto', width: '100%',
+    display: 'flex', flexDirection: 'column',
+    justifyContent: 'center', alignItems: 'center' // Centers inner content
   },
   
-  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '20px', marginTop: '20px', fontWeight: 'bold', color: '#fff' },
+  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '60px', fontWeight: 'bold', color: '#fff' },
 
   flexGrid: { 
-    display: 'flex', 
-    flexWrap: 'wrap', 
-    justifyContent: 'center', 
-    gap: '30px', 
-    width: '100%',
-    marginTop: 'auto', 
-    marginBottom: 'auto',
+    display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px', width: '100%',
+    // Removed margins so it stays grouped with header
   },
   
-  stepCardContainer: { 
-    position: 'relative',
-    flex: '1 1 300px',  
-    maxWidth: '380px',  
-    minWidth: '280px',
-  },
-  
+  stepCardContainer: { position: 'relative', flex: '1 1 300px', maxWidth: '380px', minWidth: '280px' },
   cardContent: { 
-    padding: '40px', 
-    borderRadius: '20px', 
-    border: '1px solid rgba(255,255,255,0.05)', 
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    cursor: 'default',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start'
+    padding: '40px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', 
+    backgroundColor: 'rgba(255,255,255,0.05)', cursor: 'default', height: '100%',
+    display: 'flex', flexDirection: 'column', alignItems: 'flex-start'
   },
   
   stepIcon: { marginBottom: '20px', color: '#fff' },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
   stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem', textAlign: 'left' },
 
-  sliderContainer: { width: '100%', overflow: 'hidden', marginTop: 'auto', marginBottom: 'auto' },
+  sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
   
   reviewCard: { width: '300px', padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '15px', flexShrink: 0 },
@@ -393,26 +303,6 @@ const styles = {
   reviewText: { color: '#eee', fontStyle: 'italic', fontSize: '15px' },
 
   ctaHeadline: { fontSize: '4rem', marginBottom: '40px', color: '#fff', fontWeight: 'bold' },
-  
-  finalButton: { 
-    padding: '25px 60px', 
-    fontSize: '1.5rem', 
-    backgroundColor: '#fff', 
-    color: '#000', 
-    border: 'none', 
-    borderRadius: '100px', 
-    cursor: 'pointer', 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: '15px', 
-    fontWeight: 'bold', 
-    textDecoration: 'none',
-    position: 'relative', 
-    overflow: 'hidden'
-  },
-  shimmer: {
-    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-    background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)',
-    animation: 'shimmerMove 3s infinite',
-  }
+  finalButton: { padding: '25px 60px', fontSize: '1.5rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '100px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '15px', fontWeight: 'bold', textDecoration: 'none', position: 'relative', overflow: 'hidden' },
+  shimmer: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(120deg, transparent, rgba(0,0,0,0.2), transparent)', animation: 'shimmerMove 3s infinite' }
 };
