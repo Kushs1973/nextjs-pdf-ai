@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Upload, Zap, FileText, Star, User } from 'lucide-react';
@@ -39,7 +39,7 @@ const staggerContainer = {
   }
 };
 
-// --- CARD HOVER EFFECTS ---
+// --- WHITE HOLOGRAPHIC HOVER ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
@@ -56,51 +56,6 @@ const iconSpin = {
   rest: { rotate: 0, color: "#fff" },
   hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
-
-// --- NEW: SPOTLIGHT SECTION COMPONENT ---
-// This handles the mouse tracking for each large card
-const SpotlightSection = ({ children, style, ...props }) => {
-  const divRef = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const handleMouseMove = (e) => {
-    if (!divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  return (
-    <motion.section
-      ref={divRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-      style={{ ...style, position: 'relative', overflow: 'hidden' }}
-      {...props}
-    >
-      {/* 1. The Spotlight Border Glow */}
-      <div
-        style={{
-          pointerEvents: 'none',
-          position: 'absolute',
-          inset: '-1px', // Extend slightly outside to cover border
-          opacity: opacity,
-          transition: 'opacity 0.3s',
-          zIndex: 0,
-          // A radial gradient that follows the mouse
-          background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.15), transparent 40%)`
-        }}
-      />
-      
-      {/* 2. The Content (Sits on top) */}
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {children}
-      </div>
-    </motion.section>
-  );
-};
-
 
 export default function LandingPage() {
   
@@ -139,7 +94,7 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* GLOBAL BACKGROUND LAYERS */}
+      {/* BACKGROUND LAYERS */}
       <div style={styles.gridBackground}></div>
       <div 
         style={{
@@ -150,7 +105,7 @@ export default function LandingPage() {
       ></div>
 
       {/* --- SECTION 1: HERO --- */}
-      <SpotlightSection 
+      <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
@@ -169,11 +124,11 @@ export default function LandingPage() {
         >
           PDFly
         </motion.h1>
-      </SpotlightSection>
+      </motion.section>
 
 
       {/* --- SECTION 2: HOW IT WORKS --- */}
-      <SpotlightSection 
+      <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
@@ -224,11 +179,11 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
         </div>
-      </SpotlightSection>
+      </motion.section>
 
 
       {/* --- SECTION 3: SOCIAL PROOF --- */}
-      <SpotlightSection 
+      <motion.section 
         style={styles.sectionBlock}
         initial="hidden"
         whileInView="visible"
@@ -255,11 +210,11 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </SpotlightSection>
+      </motion.section>
 
 
       {/* --- SECTION 4: CTA --- */}
-      <SpotlightSection 
+      <motion.section 
         style={{...styles.sectionBlock, justifyContent: 'center'}}
         initial="hidden"
         whileInView="visible"
@@ -281,7 +236,7 @@ export default function LandingPage() {
             </motion.button>
           </Link>
         </div>
-      </SpotlightSection>
+      </motion.section>
 
       <style jsx global>{`
         @keyframes scroll {
@@ -340,7 +295,6 @@ const styles = {
     pointerEvents: 'none',
   },
 
-  // Note: display logic moved to SpotlightSection logic
   sectionBlock: {
     zIndex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.07)',
@@ -349,7 +303,13 @@ const styles = {
     borderRadius: '40px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     minHeight: '80vh',             
-    padding: '40px',
+    padding: '40px', // FIXED: Removed extra paddingTop, reverted to uniform 40px
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start', 
+    alignItems: 'center',
     boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
   },
 
@@ -366,7 +326,15 @@ const styles = {
     alignItems: 'center'
   },
   
-  sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '20px', marginTop: '20px', fontWeight: 'bold', color: '#fff' },
+  // FIXED HEADER SPACING
+  sectionHeader: { 
+    fontSize: '3rem', 
+    textAlign: 'center', 
+    marginBottom: '20px', // Small margin, letting the grid push away
+    marginTop: '20px',    // Keep it near top
+    fontWeight: 'bold', 
+    color: '#fff' 
+  },
 
   flexGrid: { 
     display: 'flex', 
