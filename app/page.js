@@ -39,22 +39,22 @@ const staggerContainer = {
   }
 };
 
-// --- HOLOGRAPHIC CARD HOVER ---
+// --- WHITE HOLOGRAPHIC HOVER ---
 const cardHover = {
   rest: { scale: 1, borderColor: "rgba(255, 255, 255, 0.05)", backgroundColor: "rgba(255,255,255,0.05)" },
   hover: { 
     scale: 1.05, 
-    borderColor: "rgba(59, 130, 246, 0.5)", 
-    backgroundColor: "rgba(59, 130, 246, 0.1)", 
-    boxShadow: "0 10px 40px rgba(59, 130, 246, 0.2)", 
+    borderColor: "rgba(255, 255, 255, 0.8)", // Bright White Border
+    backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle White Tint
+    boxShadow: "0 0 30px rgba(255, 255, 255, 0.3)", // White Glow
     y: -10,
     transition: { duration: 0.3 }
   }
 };
 
 const iconSpin = {
-  rest: { rotate: 0 },
-  hover: { rotate: 360, scale: 1.2, color: "#60a5fa", transition: { duration: 0.5 } }
+  rest: { rotate: 0, color: "#fff" },
+  hover: { rotate: 360, scale: 1.2, color: "#ffffff", transition: { duration: 0.5 } }
 };
 
 export default function LandingPage() {
@@ -76,11 +76,8 @@ export default function LandingPage() {
     const interval = setInterval(() => {
       index = (index + 1) % fonts.length;
       setCurrentFont(fonts[index]);
-      
-      // Trigger HARD Glitch
       setGlitchActive(true);
       setTimeout(() => setGlitchActive(false), 150); 
-
     }, 400);
 
     const updateMousePosition = (e) => {
@@ -97,7 +94,7 @@ export default function LandingPage() {
   return (
     <div style={styles.container} className={outfit.className}>
       
-      {/* --- BACKGROUND LAYERS --- */}
+      {/* BACKGROUND LAYERS */}
       <div style={styles.gridBackground}></div>
       <div 
         style={{
@@ -115,16 +112,15 @@ export default function LandingPage() {
         viewport={{ once: true, amount: 0.5 }}
         variants={revealVariants}
       >
-        {/* GLITCH TITLE: More aggressive x-movement and Skew */}
         <motion.h1 
           style={{...styles.glitchTitle, fontFamily: currentFont}}
           animate={glitchActive ? { 
             x: [-5, 5, -5, 0], 
-            skewX: [-10, 10, -5, 0], // This adds the "Tilt" distortion
+            skewX: [-10, 10, -5, 0], 
             opacity: [1, 0.8, 1],
             scale: [1, 1.02, 1]
           } : { x: 0, skewX: 0, opacity: 1, scale: 1 }}
-          transition={{ duration: 0.15 }} // Super fast shake
+          transition={{ duration: 0.15 }}
         >
           PDFly
         </motion.h1>
@@ -142,20 +138,17 @@ export default function LandingPage() {
         <div style={styles.contentWrapper}>
           <h2 style={styles.sectionHeader}>How It Works</h2>
           
+          {/* USING FLEXGRID FOR CENTERING */}
           <motion.div 
-            style={styles.flexGrid} // Changed to Flexbox for perfect centering
+            style={styles.flexGrid} 
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
             {/* CARD 1 */}
-            <motion.div 
-              style={styles.stepCard} 
-              variants={revealVariants}
-              initial="rest" whileHover="hover" animate="rest"
-            >
-              <motion.div style={styles.cardContent} variants={cardHover}>
+            <motion.div style={styles.stepCardContainer} variants={revealVariants}>
+              <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <Upload size={24} />
                 </motion.div>
@@ -165,12 +158,8 @@ export default function LandingPage() {
             </motion.div>
 
             {/* CARD 2 */}
-            <motion.div 
-              style={styles.stepCard} 
-              variants={revealVariants}
-              initial="rest" whileHover="hover" animate="rest"
-            >
-              <motion.div style={styles.cardContent} variants={cardHover}>
+            <motion.div style={styles.stepCardContainer} variants={revealVariants}>
+              <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <Zap size={24} />
                 </motion.div>
@@ -180,12 +169,8 @@ export default function LandingPage() {
             </motion.div>
 
             {/* CARD 3 */}
-            <motion.div 
-              style={styles.stepCard} 
-              variants={revealVariants}
-              initial="rest" whileHover="hover" animate="rest"
-            >
-              <motion.div style={styles.cardContent} variants={cardHover}>
+            <motion.div style={styles.stepCardContainer} variants={revealVariants}>
+              <motion.div style={styles.cardContent} variants={cardHover} initial="rest" whileHover="hover" animate="rest">
                 <motion.div style={styles.stepIcon} variants={iconSpin}>
                   <FileText size={24} />
                 </motion.div>
@@ -296,7 +281,6 @@ const styles = {
     overflow: 'hidden',
   },
 
-  // --- GRID LAYERS ---
   gridBackground: {
     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0,
     backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px)`,
@@ -335,18 +319,18 @@ const styles = {
   contentWrapper: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
   sectionHeader: { fontSize: '3rem', textAlign: 'center', marginBottom: '80px', fontWeight: 'bold', color: '#fff' },
 
-  // --- FIXED: CHANGED GRID TO FLEXBOX FOR PERFECT CENTERING ---
+  // --- FIXED: FLEX GRID STYLES ---
   flexGrid: { 
     display: 'flex', 
     flexWrap: 'wrap', 
-    justifyContent: 'center', 
+    justifyContent: 'center', // THIS CENTERS THEM
     gap: '30px', 
     width: '100%' 
   },
   
-  stepCard: { 
+  stepCardContainer: { 
     position: 'relative',
-    width: '300px', // Fixed width ensures uniform size
+    width: '300px', 
     flexShrink: 0,
   },
   
@@ -364,7 +348,7 @@ const styles = {
   
   stepIcon: { marginBottom: '20px', color: '#fff' },
   stepTitle: { fontSize: '1.5rem', marginBottom: '10px', color: '#fff' },
-  stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem' },
+  stepDesc: { color: '#e5e5e5', lineHeight: '1.6', fontSize: '1.1rem', textAlign: 'left' },
 
   sliderContainer: { width: '100%', overflow: 'hidden' },
   sliderTrack: { display: 'flex', gap: '20px', width: 'max-content', animation: 'scroll 40s linear infinite' },
